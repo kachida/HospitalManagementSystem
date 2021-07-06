@@ -1,5 +1,4 @@
-package com.usersvc.exceptions;
-
+package com.patientsvc.exceptions;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.core.Ordered;
@@ -33,7 +32,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex)
 	{
 		
-		return null;
+		ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+		apiError.setMessage("No resource found for this id");
+		return buildResponseEntity(apiError);
 		
 	}
 	

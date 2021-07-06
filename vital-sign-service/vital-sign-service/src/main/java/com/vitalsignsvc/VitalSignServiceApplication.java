@@ -1,4 +1,4 @@
-package com.springboot.microservices.vitalsignservice;
+package com.vitalsignsvc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

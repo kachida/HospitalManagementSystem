@@ -1,4 +1,4 @@
-package com.patientsvc.exceptions;
+package com.vitalsignsvc.exceptions;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -47,5 +47,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		
 	}
 	
+	@ExceptionHandler(java.util.NoSuchElementException.class)
+	protected ResponseEntity<Object> handleNoSuchElementException(java.util.NoSuchElementException ex)
+	{
+		ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+		apiError.setMessage("No resource found for this id");
+		return buildResponseEntity(apiError);
+	}
 
+	@ExceptionHandler(org.springframework.dao.EmptyResultDataAccessException.class)
+	protected ResponseEntity<Object> handleNoSuchElementException(org.springframework.dao.EmptyResultDataAccessException ex)
+	{
+		ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+		apiError.setMessage("No resource found for this id");
+		return buildResponseEntity(apiError);
+	}
+
+	
 }

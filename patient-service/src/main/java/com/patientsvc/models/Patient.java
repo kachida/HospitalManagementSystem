@@ -1,5 +1,6 @@
 package com.patientsvc.models;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 
 import javax.persistence.Column;
@@ -36,6 +37,15 @@ public class Patient {
 	
 	@Email
 	String email;
-	LocalDate dateofvisit;
+	
+	@Column(name="date_of_visit")
+	Timestamp dateofvisit;
+
+	public Patient() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	
 
 }

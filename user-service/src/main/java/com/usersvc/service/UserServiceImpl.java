@@ -79,10 +79,10 @@ public class UserServiceImpl implements IUserService{
 	
 	//Get user by id
 	@Transactional(readOnly = true)
-	public User getUserById(long id)
+	public Optional<User> getUserById(long id)
 	{
-		return userRepository.findById(id).orElse(null);
-	
+		Optional<User> userDetails =  userRepository.findById(id);
+		return userDetails;
 	}
 	
 	//Add new user
@@ -97,7 +97,7 @@ public class UserServiceImpl implements IUserService{
 	@Transactional(propagation = Propagation.REQUIRES_NEW,
 					rollbackFor = Exception.class,
 					noRollbackFor = EntityNotFoundException.class)
-	public User updateUser(User updatedUser,long id)
+	public Optional<User> updateUser(User updatedUser,long id)
 	{
 		Optional<User> userDetails = userRepository.findById(id);
 		 if(userDetails.isPresent())
@@ -108,12 +108,11 @@ public class UserServiceImpl implements IUserService{
 			user.setEmail(updatedUser.getEmail());
 			user.setPhonenumber(updatedUser.getPhonenumber());
 			user.setAddress(updatedUser.getAddress());
-			return userRepository.save(user);
-		}else
-		{
-			updatedUser.setId(id);
-			return userRepository.save(updatedUser);
+			user.setId(id);
+			 userRepository.save(user);
 		}
+		 
+		 return userDetails;
 		
 				
 		

@@ -1,6 +1,7 @@
 package com.usersvc.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.usersvc.exceptions.ApiError;
 import com.usersvc.models.User;
 import com.usersvc.service.IUserService;
 
@@ -43,9 +46,16 @@ public class UserController {
 	
 	//fetch user by id
 	@GetMapping("/users/{id}")
-	public User getUserById(@PathVariable long id)
+	public ResponseEntity<User> getUserById(@PathVariable long id)
 	{
-		return userService.getUserById(id);
+		Optional<User> userDetails =  userService.getUserById(id);
+		if(userDetails.isEmpty())
+		{
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(userDetails.get());
+		}else
+		{
+			return ResponseEntity.status(HttpStatus.OK).body(userDetails.get());
+		}
 	}
 	
 	//filter and fetch users based on single field i.e, username using spring jpa filtering
@@ -98,16 +108,24 @@ public class UserController {
 	
 	//create new user
 	@PostMapping("/users")
-	public void saveUser(@RequestBody User user)
+	public ResponseEntity<User> saveUser(@RequestBody User user)
 	{
-		 userService.addUser(user);
+		return new ResponseEntity<User>(userService.addUser(user),HttpStatus.CREATED); 
 	}
 	
 	//update existing user
 	@PutMapping("/users/{id}")
-	public void updateUser(@RequestBody User user,@PathVariable long id)
+	public ResponseEntity<User> updateUser(@RequestBody User user,@PathVariable long id)
 	{
-		userService.updateUser(user,id);
+		Optional<User> userDetails = userService.updateUser(user,id);
+		if(userDetails.isEmpty())
+		{
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(user);
+		}
+		else
+		{
+			return ResponseEntity.status(HttpStatus.OK).body(userDetails.get());
+		}
 	}
 	
 	//delete user
