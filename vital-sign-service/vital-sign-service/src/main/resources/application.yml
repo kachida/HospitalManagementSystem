@@ -1,13 +1,23 @@
 spring:
-  datasource:
-    url: 'jdbc:mysql://localhost:3306/usersvc'
-    username: root
-    password: Abirami@01052020
+  application:
+    name: hospitalmanagementsystem
+  profiles:
+    active: '@activatedProfile@' 
+  cloud:
+      vault:
+        url: http://localhost:8200
+        token: s.IXCHu9hKrxjhChQNgaHPDYZ3
+        scheme: http
+        host: localhost
+        port: 8200
+        kv:
+         enabled: true
+         backend: vaultdemo
+         application-name: hospitalmanagementsystem
+  config:
+     import: vault://vaultdemo/hospitalmanagementsystem
   jpa:
     hibernate:
       ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-  jackson:
-    serialization:
-      fail-on-empty-beans: false
