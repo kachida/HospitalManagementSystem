@@ -9,3 +9,8 @@ spring:
       username: ${dbusername}
       password: ${dbpassword}
       url: ${dbjdbcurl}
+
+api:
+   username: ${api_username}
+   password: ${api_password}
+   secretKey: ${secret_key}
