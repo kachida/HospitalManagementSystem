@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.usersvc.aspect.Loggable;
 import com.usersvc.models.User;
 import com.usersvc.repository.IUserRepository;
 
@@ -40,6 +41,7 @@ public class UserServiceImpl implements IUserService{
 	//Get all users
 	@Override
 	@Transactional(readOnly = true)
+	@Loggable
 	public List<User> getAllUsers(int pageNo, int pageSize, String sortBy) {
 
 		Pageable paging = PageRequest.of(pageNo, pageSize);
@@ -60,6 +62,7 @@ public class UserServiceImpl implements IUserService{
 	//Get all users - filter with name
 	@Override
 	@Transactional(readOnly = true)
+	@Loggable
 	public List<User> getUsersWithNameFilter(String query,int pageNo, int pageSize, String sortBy) {
 
 		Pageable paging = PageRequest.of(pageNo, pageSize);
@@ -79,6 +82,7 @@ public class UserServiceImpl implements IUserService{
 	
 	//Get user by id
 	@Transactional(readOnly = true)
+	@Loggable
 	public Optional<User> getUserById(long id)
 	{
 		Optional<User> userDetails =  userRepository.findById(id);
@@ -87,6 +91,7 @@ public class UserServiceImpl implements IUserService{
 	
 	//Add new user
 	@Transactional(propagation = Propagation.REQUIRED)
+	@Loggable
 	public User addUser(User user)
 	{
 		return userRepository.save(user);
@@ -94,6 +99,7 @@ public class UserServiceImpl implements IUserService{
 	}
 	
 	//update existing user
+	@Loggable
 	@Transactional(propagation = Propagation.REQUIRES_NEW,
 					rollbackFor = Exception.class,
 					noRollbackFor = EntityNotFoundException.class)
@@ -119,6 +125,7 @@ public class UserServiceImpl implements IUserService{
 	}
 	
 	//delete user
+	@Loggable
 	@Transactional(propagation = Propagation.REQUIRES_NEW,
 			rollbackFor = Exception.class,
 			noRollbackFor = EntityNotFoundException.class)
@@ -129,6 +136,7 @@ public class UserServiceImpl implements IUserService{
 
 
 	@Override
+	@Loggable
 	@Transactional(readOnly = true)
 	public List<User> getUsersWithMultipleFilter(String username, String role, String email, int pageNo, int pageSize,
 			String sortBy) {
@@ -160,6 +168,7 @@ public class UserServiceImpl implements IUserService{
 
 	//Query with Named Queries
 	@Override
+	@Loggable
 	@Transactional(readOnly = true)
 	public List<User> getUsersWithEmailIdFilter(String query, int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
@@ -171,6 +180,7 @@ public class UserServiceImpl implements IUserService{
 
 	//Query with Named Queries
 	@Override
+	@Loggable
 	@Transactional(readOnly = true)
 	public List<User> getUsersWithRoleAndUserNameFilter(String username, String role, int pageNo, int pageSize,
 			String sortBy) {

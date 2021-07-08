@@ -20,12 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vitalsignsvc.security.JwtUtil;
-import com.vitalsignsvc.service.MyUserDetailService;
+import com.vitalsignsvc.aspect.Loggable;
 import com.vitalsignsvc.models.AuthenticationRequest;
 import com.vitalsignsvc.models.AuthenticationResponse;
 import com.vitalsignsvc.models.Vitalsign;
+import com.vitalsignsvc.security.JwtUtil;
 import com.vitalsignsvc.service.IVitalsignService;
+import com.vitalsignsvc.service.MyUserDetailService;
 
 @RestController
 @RequestMapping("/vitalsignsvc")
@@ -46,6 +47,7 @@ public class VitalsignController {
 	
 	// fetch all vitalsign records
 		@GetMapping("/vitalsign")
+		@Loggable
 		public ResponseEntity<List<Vitalsign>> getAllVitalsignRecords(@RequestParam(defaultValue = "0") int pageNo,
 				@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "Id") String sortBy) {
 			List<Vitalsign> vitalsignList = vitalsignService.getAllVitalSignRecords(pageNo, pageSize, sortBy);
@@ -54,18 +56,21 @@ public class VitalsignController {
 
 		// fetch vitalsign record by id
 		@GetMapping("/vitalsign/{id}")
+		@Loggable
 		public ResponseEntity<Vitalsign> getUserById(@PathVariable long id) {
 			return ResponseEntity.status(HttpStatus.OK).body(vitalsignService.getVitalsignRecordById(id));
 		}
 
 		// create new vitalsign record
 		@PostMapping("/createvitalsign/{id}")
+		@Loggable
 		public ResponseEntity<Vitalsign> saveVitalsignRecord(@RequestBody Vitalsign vitalsign,@PathVariable long id) {
 			return new ResponseEntity<Vitalsign>(vitalsignService.addVitalsignRecord(vitalsign,id), HttpStatus.CREATED);
 		}
 
 		// update existing vitalsign record
 		@PutMapping("/vitalsign/{patient_id}/{id}")
+		@Loggable
 		public ResponseEntity<Vitalsign> updateVitalsignRecord(@RequestBody Vitalsign vitalsign,@PathVariable long patient_id, @PathVariable long id) {
 			Optional<Vitalsign> vitalsignDetails = vitalsignService.updateVitalsignRecord(vitalsign,patient_id, id);
 			if (vitalsignDetails.isEmpty()) {
@@ -77,12 +82,14 @@ public class VitalsignController {
 
 		// delete vitalsign record
 		@DeleteMapping("/vitalsign/{id}")
+		@Loggable
 		public void deleteVitalsignRecord(@PathVariable long id) {
 			vitalsignService.deleteVitalsignRecord(id);
 		}
 		
 		//Authenticate
 		@PostMapping("/authenticate")
+		@Loggable
 		public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception
 		{
 			authenticationManager.authenticate(

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vitalsignsvc.aspect.Loggable;
 import com.vitalsignsvc.models.Patient;
 import com.vitalsignsvc.models.Vitalsign;
 import com.vitalsignsvc.repository.IPatientRepository;
@@ -36,6 +37,7 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	//fetch all vitalsign records
 	@Override
 	@Transactional(readOnly=true)
+	@Loggable
 	public List<Vitalsign> getAllVitalSignRecords(int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
 		Pageable paging = PageRequest.of(pageNo, pageSize);
@@ -55,6 +57,7 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	 */
 	@Override
 	@Transactional(readOnly=true)
+	@Loggable
 	public Vitalsign getVitalsignRecordById(long id) {
 		// TODO Auto-generated method stub
 		Vitalsign vitalSign = vitalsignRepository.findById(id).orElse(null);
@@ -67,6 +70,7 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
+	@Loggable
 	public Vitalsign addVitalsignRecord(Vitalsign vitalSign,long patient_id) {
 		// TODO Auto-generated method stub
 		Optional<Patient> patient=patientRepository.findById(patient_id);
@@ -84,6 +88,7 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	 * update vitalsign record
 	 */
 	@Override
+	@Loggable
 	@Transactional(propagation = Propagation.REQUIRES_NEW,
 					rollbackFor = Exception.class,
 					noRollbackFor = EntityNotFoundException.class)
@@ -110,6 +115,7 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	 * delete patient record
 	 */
 	@Override
+	@Loggable
 	@Transactional(propagation = Propagation.REQUIRES_NEW,
 					rollbackFor = Exception.class,
 					noRollbackFor = EntityNotFoundException.class)

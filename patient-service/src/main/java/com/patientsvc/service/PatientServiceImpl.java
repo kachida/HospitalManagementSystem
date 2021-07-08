@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.patientsvc.aspect.Loggable;
 import com.patientsvc.models.Patient;
 import com.patientsvc.repository.IPatientRepository;
 
@@ -32,6 +33,7 @@ public class PatientServiceImpl implements IPatientService {
 	//fetch all patients 
 	@Override
 	@Transactional(readOnly=true)
+	@Loggable
 	public List<Patient> getAllPatients(int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
 		Pageable paging = PageRequest.of(pageNo, pageSize);
@@ -51,6 +53,7 @@ public class PatientServiceImpl implements IPatientService {
 	 */
 	@Override
 	@Transactional(readOnly=true)
+	@Loggable
 	public Patient getPatientById(long id) {
 		// TODO Auto-generated method stub
 		Patient patient = (Patient) entityManager.find(Patient.class, id);
@@ -63,6 +66,7 @@ public class PatientServiceImpl implements IPatientService {
 	 */
 	@Override
 	@Transactional
+	@Loggable
 	public Patient addPatient(Patient patient) {
 		entityManager.persist(patient);
 		return patient;
@@ -74,6 +78,7 @@ public class PatientServiceImpl implements IPatientService {
 	 * update patient record
 	 */
 	@Override
+	@Loggable
 	@Transactional(propagation = Propagation.REQUIRES_NEW,
 					rollbackFor = Exception.class,
 					noRollbackFor = EntityNotFoundException.class)
@@ -97,6 +102,7 @@ public class PatientServiceImpl implements IPatientService {
 	 * delete patient record
 	 */
 	@Override
+	@Loggable
 	@Transactional(propagation = Propagation.REQUIRES_NEW,
 					rollbackFor = Exception.class,
 					noRollbackFor = EntityNotFoundException.class)

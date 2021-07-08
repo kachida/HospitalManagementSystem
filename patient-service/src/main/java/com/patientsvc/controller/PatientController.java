@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.patientsvc.aspect.Loggable;
 import com.patientsvc.models.AuthenticationRequest;
 import com.patientsvc.models.AuthenticationResponse;
 import com.patientsvc.models.Patient;
@@ -46,6 +47,7 @@ public class PatientController {
 
 	// fetch all patients
 	@GetMapping("/patients")
+	@Loggable
 	public ResponseEntity<List<Patient>> getAllPatients(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "Id") String sortBy) {
 		List<Patient> patientList = patientService.getAllPatients(pageNo, pageSize, sortBy);
@@ -56,18 +58,21 @@ public class PatientController {
 
 	// fetch patient by id
 	@GetMapping("/patients/{id}")
+	@Loggable
 	public ResponseEntity<Patient> getUserById(@PathVariable long id) {
 		return ResponseEntity.status(HttpStatus.OK).body(patientService.getPatientById(id));
 	}
 
 	// create new patient record
 	@PostMapping("/patients")
+	@Loggable
 	public ResponseEntity<Patient> savePatientRecord(@RequestBody Patient patient) {
 		return new ResponseEntity<Patient>(patientService.addPatient(patient), HttpStatus.CREATED);
 	}
 
 	// update existing patient
 	@PutMapping("/patients/{id}")
+	@Loggable
 	public ResponseEntity<Patient> updatePatientRecord(@RequestBody Patient patient, @PathVariable long id) {
 		Optional<Patient> patientDetails = patientService.updatePatient(patient, id);
 		if (patientDetails.isEmpty()) {
@@ -79,12 +84,14 @@ public class PatientController {
 
 	// delete patients
 	@DeleteMapping("/patients/{id}")
+	@Loggable
 	public void deletePatientRecord(@PathVariable long id) {
 		patientService.deletePatient(id);
 	}
 
 	//Authenticate
 	@PostMapping("/authenticate")
+	@Loggable
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception
 	{
 		authenticationManager.authenticate(
