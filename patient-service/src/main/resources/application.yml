@@ -6,7 +6,7 @@ spring:
   cloud:
       vault:
         url: http://localhost:8200
-        token: s.IXCHu9hKrxjhChQNgaHPDYZ3
+        token: s.OXqR5O54ruxpyfaUZ1VfNjbP
         scheme: http
         host: localhost
         port: 8200
@@ -15,7 +15,7 @@ spring:
          backend: vaultdemo
          application-name: hospitalmanagementsystem
   config:
-     import: vault://vaultdemo/hospitalmanagementsystem
+     import: vault://hospitalmanagementsystem
   jpa:
     hibernate:
       ddl-auto: none

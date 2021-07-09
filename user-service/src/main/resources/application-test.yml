@@ -4,11 +4,19 @@ server:
 
 spring:
    config:
-      import: vault://vaultdemo/hospitalmanagementsystem/test
+      import: vault://hospitalmanagementsystem/test
    datasource:
       username: ${dbusername}
       password: ${dbpassword}
       url: ${dbjdbcurl}
+   redis:
+      host: 127.0.0.1
+      port: 6379
+   cache:
+      redis:
+        cache-null-values: false
+        time-to-live: 6000000
+        
 
 api:
    username: ${api_username}

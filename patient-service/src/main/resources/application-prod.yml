@@ -4,7 +4,7 @@ server:
 
 spring:
    config:
-      import: vault://vaultdemo/hospitalmanagementsystem/prod
+      import: vault://hospitalmanagementsystem/prod
    datasource:
       username: ${dbusername}
       password: ${dbpassword}
