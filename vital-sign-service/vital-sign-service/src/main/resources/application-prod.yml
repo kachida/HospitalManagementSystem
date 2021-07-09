@@ -1,6 +1,6 @@
 ## Server Properties
 server:
-   port: 8083
+   port: 8092
 
 spring:
    config:

@@ -28,9 +28,15 @@ import com.usersvc.security.JwtUtil;
 import com.usersvc.service.IUserService;
 import com.usersvc.service.MyUserDetailService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 
 @RestController
 @RequestMapping("/usersvc")
+@Api(value="UserController", description="Operations pertaining to users in user module API")
 public class UserController {
 	
 
@@ -50,6 +56,11 @@ public class UserController {
 	//fetch all users pagination supported
 	@GetMapping("/users")
 	@Loggable
+	@ApiOperation(value = "Retrieve All Users with pagination and sorting supported", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<List<User>> getAllUsers(
 			@RequestParam(defaultValue="0") int pageNo,
 			@RequestParam(defaultValue="10") int pageSize,
@@ -64,6 +75,12 @@ public class UserController {
 	//fetch user by id
 	@GetMapping("/users/{id}")
 	@Loggable
+	@ApiOperation(value = "Retrieve user details with given id", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+	        @ApiResponse(code = 204, message = "No resource found for this id"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token"),
+	})
 	public ResponseEntity<User> getUserById(@PathVariable long id)
 	{
 		Optional<User> userDetails =  userService.getUserById(id);
@@ -79,6 +96,11 @@ public class UserController {
 	//filter and fetch users based on single field i.e, username using spring jpa filtering
 	@GetMapping("/users/search")
 	@Loggable
+	@ApiOperation(value = "Retrieve all users with given username", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<List<User>> getUsersWithNameFilter(@RequestParam("query") String query,
 			@RequestParam(defaultValue="0") int pageNo,
 			@RequestParam(defaultValue="10") int pageSize,
@@ -88,10 +110,33 @@ public class UserController {
 		return new ResponseEntity<List<User>>(userList,new HttpHeaders(), HttpStatus.OK);
 	}
 	
+	//Fetch users based on emailid - using namedqueries 
+		@GetMapping("/users/filter/emailid")
+		@Loggable
+		@ApiOperation(value = "Retrieve all users with given email", produces = "application/json")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+		})
+		public ResponseEntity<List<User>> getUsersWithEmailFilter(
+				@RequestParam("email") String email,
+				@RequestParam(defaultValue="0") int pageNo,
+				@RequestParam(defaultValue="10") int pageSize,
+				@RequestParam(defaultValue="Id") String sortBy)
+		{
+			List<User> userList = userService.getUsersWithEmailIdFilter(email, pageNo, pageSize, sortBy);
+			return new ResponseEntity<List<User>>(userList,new HttpHeaders(), HttpStatus.OK);
+		}
+	
 	//filter and fetch users based on multiple fields (username, email,role) - using criteria API 
 	@GetMapping("/users/filter")
 	@Loggable
-	public ResponseEntity<List<User>> getUsersWithNameFilter(@RequestParam("name") String username,
+	@ApiOperation(value = "Retrieve all users with given username, email and role", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
+	public ResponseEntity<List<User>> getUsersWithNameRoleEmailFilter(@RequestParam("name") String username,
 			@RequestParam("role") String role,
 			@RequestParam("email") String email,
 			@RequestParam(defaultValue="0") int pageNo,
@@ -102,23 +147,16 @@ public class UserController {
 		return new ResponseEntity<List<User>>(userList,new HttpHeaders(), HttpStatus.OK);
 	}
 	
-	//Fetch users based on emailid - using namedqueries 
-	@GetMapping("/users/filter/emailid")
-	@Loggable
-	public ResponseEntity<List<User>> getUsersWithEmailFilter(
-			@RequestParam("email") String email,
-			@RequestParam(defaultValue="0") int pageNo,
-			@RequestParam(defaultValue="10") int pageSize,
-			@RequestParam(defaultValue="Id") String sortBy)
-	{
-		List<User> userList = userService.getUsersWithEmailIdFilter(email, pageNo, pageSize, sortBy);
-		return new ResponseEntity<List<User>>(userList,new HttpHeaders(), HttpStatus.OK);
-	}
 	
 	//Filter and fetch users based on multiple fields i.e, username and role using namedqueries)
 	@GetMapping("/users/filter/roleAndName")
 	@Loggable
-	public ResponseEntity<List<User>> getUsersWithNameFilter(@RequestParam("name") String username,
+	@ApiOperation(value = "Retrieve all users with given username, email and role", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
+	public ResponseEntity<List<User>> getUsersWithNameRoleFilter(@RequestParam("name") String username,
 			@RequestParam("role") String role,
 			@RequestParam(defaultValue="0") int pageNo,
 			@RequestParam(defaultValue="10") int pageSize,
@@ -131,6 +169,11 @@ public class UserController {
 	//create new user
 	@PostMapping("/users")
 	@Loggable
+	@ApiOperation(value = "To create a new user", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 201, message = "Successfully the record is created"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<User> saveUser(@RequestBody User user)
 	{
 		return new ResponseEntity<User>(userService.addUser(user),HttpStatus.CREATED); 
@@ -139,6 +182,12 @@ public class UserController {
 	//update existing user
 	@PutMapping("/users/{id}")
 	@Loggable
+	@ApiOperation(value = "To update the existing  user", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully the record is updated"),
+	        @ApiResponse(code = 204, message = "No resource found for this id"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<User> updateUser(@RequestBody User user,@PathVariable long id)
 	{
 		Optional<User> userDetails = userService.updateUser(user,id);
@@ -155,6 +204,12 @@ public class UserController {
 	//delete user
 	@DeleteMapping("/users/{id}")
 	@Loggable
+	@ApiOperation(value = "To delete the existing  user", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully the record is deleted"),
+	        @ApiResponse(code = 204, message = "No resource found for this id"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public void deleteUser(@PathVariable long id)
 	{
 		userService.deleterUser(id);
@@ -163,6 +218,11 @@ public class UserController {
 	//Authenticate
 	@PostMapping("/authenticate")
 	@Loggable
+	@ApiOperation(value = "To generate a new JWT Token", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully the jwt token is generated"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check input credentials")
+	})
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception
 	{
 		authenticationManager.authenticate(

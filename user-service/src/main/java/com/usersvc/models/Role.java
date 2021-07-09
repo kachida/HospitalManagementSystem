@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,8 +26,10 @@ public class Role implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@ApiModelProperty(notes = "The database generated user ID")
 	@Column(name="role_id")
 	private long id;
+	@ApiModelProperty(notes = "role name")
 	@Column(name="name")
 	private String role_name;
 

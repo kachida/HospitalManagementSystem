@@ -15,6 +15,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -26,21 +27,34 @@ public class Vitalsign {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@ApiModelProperty(notes = "The database generated user ID")
 	@Column(name="ID")
 	long id;
 	
-	float temperature;
-	float bloodsugar;
-	float weight;
-	float height;
-	float spo2;
-	float pulse;
+	@Column(name="user_id")
+	@ApiModelProperty(notes = "user id")
+	long user_id;
+	@Column(name="patient_id")
+	@ApiModelProperty(notes = "patient id")
+	long patient_id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="patient_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
-	Patient patient_id;
+	@ApiModelProperty(notes = "temperature in celsius")
+	float temperature;
+	@ApiModelProperty(notes = "blood sugar level in unit")
+	float bloodsugar;
+	@ApiModelProperty(notes = "Body weight in kg's")
+	float weight;
+	@ApiModelProperty(notes = "height in cm's")
+	float height;
+	@ApiModelProperty(notes = "spo2")
+	float spo2;
+	@ApiModelProperty(notes = "pulse")
+	float pulse;
+	@ApiModelProperty(notes = "patient name")
+	String patient_name;
+	@ApiModelProperty(notes = "user name")
+	String user_name;
+	
 
 	public Vitalsign() {
 		super();

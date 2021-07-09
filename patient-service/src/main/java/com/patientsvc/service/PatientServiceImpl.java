@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.patientsvc.aspect.Loggable;
 import com.patientsvc.models.Patient;
 import com.patientsvc.repository.IPatientRepository;
+import com.patientsvc.feign.UserServiceClient;
+import com.patientsvc.models.User;
 
 @Service
 public class PatientServiceImpl implements IPatientService {
@@ -29,6 +31,9 @@ public class PatientServiceImpl implements IPatientService {
 	
 	@Autowired
 	IPatientRepository patientRepository;
+	
+	@Autowired
+	UserServiceClient userServiceClient;
 
 	//fetch all patients 
 	@Override
@@ -84,6 +89,8 @@ public class PatientServiceImpl implements IPatientService {
 					noRollbackFor = EntityNotFoundException.class)
 	public Optional<Patient> updatePatient(Patient updatedPatient, long id) {
 		// TODO Auto-generated method stub
+		long user_id = updatedPatient.getUser_id();
+		User user = getUserServiceData(user_id);
 		Optional<Patient> patientDetails = patientRepository.findById(id);
 		 if(patientDetails.isPresent())
 		 {
@@ -96,6 +103,11 @@ public class PatientServiceImpl implements IPatientService {
 			patientRepository.save(patient);
 		}
 		 return patientDetails;
+	}
+	
+	//Feign Client to fetch user details from user module API
+	public User getUserServiceData(long user_id) {
+		return userServiceClient.getUserById(user_id);
 	}
 
 	/*Spring persistance Implementation using Transaction Manager

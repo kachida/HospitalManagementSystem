@@ -28,9 +28,15 @@ import com.patientsvc.security.JwtUtil;
 import com.patientsvc.service.IPatientService;
 import com.patientsvc.service.MyUserDetailService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 
 @RestController
 @RequestMapping("/patientsvc")
+@Api(value="PatientController", description="Operations pertaining to patients in patient module API")
 public class PatientController {
 
 	@Autowired
@@ -48,6 +54,11 @@ public class PatientController {
 	// fetch all patients
 	@GetMapping("/patients")
 	@Loggable
+	@ApiOperation(value = "Retrieve all Patients with pagination and sorting supported", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<List<Patient>> getAllPatients(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "Id") String sortBy) {
 		List<Patient> patientList = patientService.getAllPatients(pageNo, pageSize, sortBy);
@@ -59,6 +70,12 @@ public class PatientController {
 	// fetch patient by id
 	@GetMapping("/patients/{id}")
 	@Loggable
+	@ApiOperation(value = "Retrieve patient details with given id", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+	        @ApiResponse(code = 204, message = "No resource found for this id"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token"),
+	})
 	public ResponseEntity<Patient> getUserById(@PathVariable long id) {
 		return ResponseEntity.status(HttpStatus.OK).body(patientService.getPatientById(id));
 	}
@@ -66,6 +83,11 @@ public class PatientController {
 	// create new patient record
 	@PostMapping("/patients")
 	@Loggable
+	@ApiOperation(value = "To create a new patient record", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 201, message = "Successfully the record is created"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<Patient> savePatientRecord(@RequestBody Patient patient) {
 		return new ResponseEntity<Patient>(patientService.addPatient(patient), HttpStatus.CREATED);
 	}
@@ -73,6 +95,12 @@ public class PatientController {
 	// update existing patient
 	@PutMapping("/patients/{id}")
 	@Loggable
+	@ApiOperation(value = "To update the existing  patient", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully the record is updated"),
+	        @ApiResponse(code = 204, message = "No resource found for this id"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<Patient> updatePatientRecord(@RequestBody Patient patient, @PathVariable long id) {
 		Optional<Patient> patientDetails = patientService.updatePatient(patient, id);
 		if (patientDetails.isEmpty()) {
@@ -85,6 +113,12 @@ public class PatientController {
 	// delete patients
 	@DeleteMapping("/patients/{id}")
 	@Loggable
+	@ApiOperation(value = "To delete the existing  patient record", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully the record is deleted"),
+	        @ApiResponse(code = 204, message = "No resource found for this id"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public void deletePatientRecord(@PathVariable long id) {
 		patientService.deletePatient(id);
 	}
@@ -92,6 +126,11 @@ public class PatientController {
 	//Authenticate
 	@PostMapping("/authenticate")
 	@Loggable
+	@ApiOperation(value = "To generate a new JWT Token", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully the jwt token is generated"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception
 	{
 		authenticationManager.authenticate(

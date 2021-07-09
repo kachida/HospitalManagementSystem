@@ -28,8 +28,14 @@ import com.vitalsignsvc.security.JwtUtil;
 import com.vitalsignsvc.service.IVitalsignService;
 import com.vitalsignsvc.service.MyUserDetailService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/vitalsignsvc")
+@Api(value="VitalsignController", description="Operations pertaining to vitalsigns in vitalsign module API")
 public class VitalsignController {
 
 	@Autowired
@@ -48,6 +54,11 @@ public class VitalsignController {
 	// fetch all vitalsign records
 		@GetMapping("/vitalsign")
 		@Loggable
+		@ApiOperation(value = "Retrieve all vitalsign records with pagination and sorting supported", produces = "application/json")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+		})
 		public ResponseEntity<List<Vitalsign>> getAllVitalsignRecords(@RequestParam(defaultValue = "0") int pageNo,
 				@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "Id") String sortBy) {
 			List<Vitalsign> vitalsignList = vitalsignService.getAllVitalSignRecords(pageNo, pageSize, sortBy);
@@ -57,6 +68,12 @@ public class VitalsignController {
 		// fetch vitalsign record by id
 		@GetMapping("/vitalsign/{id}")
 		@Loggable
+		@ApiOperation(value = "Retrieve vitalsign details with given id", produces = "application/json")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+		        @ApiResponse(code = 204, message = "No resource found for this id"),
+		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token"),
+		})
 		public ResponseEntity<Vitalsign> getUserById(@PathVariable long id) {
 			return ResponseEntity.status(HttpStatus.OK).body(vitalsignService.getVitalsignRecordById(id));
 		}
@@ -64,15 +81,26 @@ public class VitalsignController {
 		// create new vitalsign record
 		@PostMapping("/createvitalsign/{id}")
 		@Loggable
-		public ResponseEntity<Vitalsign> saveVitalsignRecord(@RequestBody Vitalsign vitalsign,@PathVariable long id) {
-			return new ResponseEntity<Vitalsign>(vitalsignService.addVitalsignRecord(vitalsign,id), HttpStatus.CREATED);
+		@ApiOperation(value = "To create a new vitalsign record", produces = "application/json")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 201, message = "Successfully the record is created"),
+		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+		})
+		public ResponseEntity<Vitalsign> saveVitalsignRecord(@RequestBody Vitalsign vitalsign) {
+			return new ResponseEntity<Vitalsign>(vitalsignService.addVitalsignRecord(vitalsign), HttpStatus.CREATED);
 		}
 
 		// update existing vitalsign record
-		@PutMapping("/vitalsign/{patient_id}/{id}")
+		@PutMapping("/vitalsign/{id}")
 		@Loggable
-		public ResponseEntity<Vitalsign> updateVitalsignRecord(@RequestBody Vitalsign vitalsign,@PathVariable long patient_id, @PathVariable long id) {
-			Optional<Vitalsign> vitalsignDetails = vitalsignService.updateVitalsignRecord(vitalsign,patient_id, id);
+		@ApiOperation(value = "To update the existing  vitalsign record", produces = "application/json")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 200, message = "Successfully the record is updated"),
+		        @ApiResponse(code = 204, message = "No resource found for this id"),
+		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+		})
+		public ResponseEntity<Vitalsign> updateVitalsignRecord(@RequestBody Vitalsign vitalsign, @PathVariable long id) {
+			Optional<Vitalsign> vitalsignDetails = vitalsignService.updateVitalsignRecord(vitalsign, id);
 			if (vitalsignDetails.isEmpty()) {
 				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(vitalsign);
 			} else {
@@ -83,6 +111,12 @@ public class VitalsignController {
 		// delete vitalsign record
 		@DeleteMapping("/vitalsign/{id}")
 		@Loggable
+		@ApiOperation(value = "To delete the existing  vitalsign record", produces = "application/json")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 200, message = "Successfully the record is deleted"),
+		        @ApiResponse(code = 204, message = "No resource found for this id"),
+		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+		})
 		public void deleteVitalsignRecord(@PathVariable long id) {
 			vitalsignService.deleteVitalsignRecord(id);
 		}
@@ -90,6 +124,11 @@ public class VitalsignController {
 		//Authenticate
 		@PostMapping("/authenticate")
 		@Loggable
+		@ApiOperation(value = "To generate a new JWT Token", produces = "application/json")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 200, message = "Successfully the jwt token is generated"),
+		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+		})
 		public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception
 		{
 			authenticationManager.authenticate(

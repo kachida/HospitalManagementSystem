@@ -22,6 +22,10 @@ import com.usersvc.models.Role;
 import com.usersvc.models.User;
 import com.usersvc.service.IRoleService;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/rolesvc")
 public class RoleController {
@@ -32,6 +36,11 @@ public class RoleController {
 	// fetch all roles
 	@GetMapping("/roles")
 	@Loggable
+	@ApiOperation(value = "Retrieve All Roles", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<List<Role>> getAllRoles() {
 		List<Role> roleList = roleService.getAllRoles();
 		return new ResponseEntity<List<Role>>(roleList, new HttpHeaders(), HttpStatus.OK);
@@ -40,6 +49,12 @@ public class RoleController {
 	// fetch roles by id
 	@GetMapping("/roles/{id}")
 	@Loggable
+	@ApiOperation(value = "Retrieve role details by role id", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
+	        @ApiResponse(code = 204, message = "No resource found for this id"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token"),
+	})
 	public ResponseEntity<Role> getRolesById(@PathVariable long id) {
 		Optional<Role> roleDetails = roleService.getRoleById(id);
 		if (roleDetails.isEmpty()) {
@@ -52,6 +67,11 @@ public class RoleController {
 	// create new user
 	@PostMapping("/roles")
 	@Loggable
+	@ApiOperation(value = "To create a new role", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 201, message = "Successfully the record is created"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<Role> saveUser(@RequestBody Role role) {
 		return new ResponseEntity<Role>(roleService.addRole(role), HttpStatus.CREATED);
 	}
@@ -59,6 +79,12 @@ public class RoleController {
 	// update existing user
 	@PutMapping("/roles/{id}")
 	@Loggable
+	@ApiOperation(value = "To update the existing  role", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully the record is updated"),
+	        @ApiResponse(code = 204, message = "No resource found for this id"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public ResponseEntity<Role> updateRole(@RequestBody Role role, @PathVariable long id) {
 		Optional<Role> roleDetails = roleService.updateRole(role, id);
 		if (roleDetails.isEmpty()) {
@@ -71,6 +97,12 @@ public class RoleController {
 	// delete roles
 	@DeleteMapping("/roles/{id}")
 	@Loggable
+	@ApiOperation(value = "To delete the existing  role", produces = "application/json")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully the record is deleted"),
+	        @ApiResponse(code = 204, message = "No resource found for this id"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
+	})
 	public void deleteRole(@PathVariable long id) {
 		roleService.deleteRole(id);
 	}

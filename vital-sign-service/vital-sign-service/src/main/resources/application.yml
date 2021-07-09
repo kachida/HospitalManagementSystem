@@ -6,7 +6,7 @@ spring:
   cloud:
       vault:
         url: http://localhost:8200
-        token: s.OXqR5O54ruxpyfaUZ1VfNjbP
+        token: s.q5cEyiJoNoHdwoULn3dr2aeA
         scheme: http
         host: localhost
         port: 8200

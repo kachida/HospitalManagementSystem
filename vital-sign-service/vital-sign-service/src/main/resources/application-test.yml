@@ -1,6 +1,6 @@
 ## Server Properties
 server:
-   port: 8081
+   port: 8083
 
 spring:
    config:
@@ -22,3 +22,5 @@ api:
    username: ${api_username}
    password: ${api_password}
    secretKey: ${secret_key}
+   userServiceAccessToken: ${userServiceAccessToken}
+   patientServiceAccessToken: ${patientServiceAccessToken} 

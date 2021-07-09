@@ -11,8 +11,8 @@ public interface IVitalsignService {
 	
 	public List<Vitalsign> getAllVitalSignRecords(int pageNo, int pageSize, String sortBy);
 	public Vitalsign getVitalsignRecordById(long id);
-	public Vitalsign addVitalsignRecord(Vitalsign patient,long patient_id);
-	public Optional<Vitalsign> updateVitalsignRecord(Vitalsign vitalsign,long patient_id,long id);
+	public Vitalsign addVitalsignRecord(Vitalsign vitalSign);
+	public Optional<Vitalsign> updateVitalsignRecord(Vitalsign vitalsign,long id);
 	public void deleteVitalsignRecord(long id);
 
 }
