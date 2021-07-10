@@ -22,3 +22,9 @@ api:
    username: ${api_username}
    password: ${api_password}
    secretKey: ${secret_key}
+
+management:
+   endpoints:
+       web:
+         exposure:
+             include: '*'

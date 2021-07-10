@@ -1,7 +1,10 @@
 package com.usersvc.controller;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +31,7 @@ import com.usersvc.security.JwtUtil;
 import com.usersvc.service.IUserService;
 import com.usersvc.service.MyUserDetailService;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -40,6 +44,8 @@ import io.swagger.annotations.ApiResponses;
 public class UserController {
 	
 
+	@Autowired
+	MeterRegistry meterRegistry;
 	
 	@Autowired
 	private IUserService userService;
@@ -66,8 +72,12 @@ public class UserController {
 			@RequestParam(defaultValue="10") int pageSize,
 			@RequestParam(defaultValue="Id") String sortBy)
 	{
+		//Custom Metrics added to get the API Method execution time and Api request count
+		Instant start = Instant.now();
 		List<User> userList =  userService.getAllUsers(pageNo, pageSize, sortBy);
-		
+		Instant stop = Instant.now();
+		meterRegistry.counter("usersvc.getallusers.count").increment();
+		meterRegistry.timer("usersvc.getallusers.executiontime").record(Duration.between(start, stop).toMillis(),TimeUnit.MILLISECONDS);
 		return new ResponseEntity<List<User>>(userList, new HttpHeaders(), HttpStatus.OK);
 		
 	}
@@ -83,6 +93,7 @@ public class UserController {
 	})
 	public ResponseEntity<User> getUserById(@PathVariable long id)
 	{
+
 		Optional<User> userDetails =  userService.getUserById(id);
 		if(userDetails.isEmpty())
 		{
@@ -106,6 +117,7 @@ public class UserController {
 			@RequestParam(defaultValue="10") int pageSize,
 			@RequestParam(defaultValue="Id") String sortBy)
 	{
+		
 		List<User> userList = userService.getUsersWithNameFilter(query, pageNo, pageSize, sortBy);
 		return new ResponseEntity<List<User>>(userList,new HttpHeaders(), HttpStatus.OK);
 	}
