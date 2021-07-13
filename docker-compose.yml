@@ -1,0 +1,109 @@
+version: '3'
+services:
+  consul:
+    image: consul:1.7
+    networks:
+      - spring-boot-microservices-network
+  mysqldb:
+    image: mysql:8.0
+    restart: always
+    container_name: mysqldb
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    environment:
+      MYSQL_DATABASE: usersvc
+    networks:
+      - spring-boot-microservices-network
+    volumes:
+            - db_data:/var/lib/mysql
+  
+  redis:
+   container_name: redis
+   image: redis:6-alpine
+   hostname: redis
+   networks:
+      - spring-boot-microservices-network
+   ports: 
+    - "6379:6379"
+
+  vault:
+    image: vault
+    container_name: vault
+    networks:
+      - spring-boot-microservices-network
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: 00000000-0000-0000-0000-000000000000
+      VAULT_DEV_TOKEN: 00000000-0000-0000-0000-000000000000
+      VAULT_TOKEN: 00000000-0000-0000-0000-000000000000
+      VAULT_ADDR: 'http://vault:8200'
+    ports:
+      - 8200:8200
+
+  setup-vault:
+    image: vault
+    container_name: setup_vault
+    entrypoint: /bin/sh
+    networks:
+      - spring-boot-microservices-network
+    volumes:
+      - './config:/config'
+    environment:
+      VAULT_ADDR: 'http://vault:8200'
+      CONFIG_ADDR: '/config'
+    command:  -c " /config/vault-init.sh; "
+    depends_on:
+      - vault
+
+  user-service:
+    container_name: user-service
+    build: ./user-service
+    restart: on-failure
+    networks:
+      - spring-boot-microservices-network
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysqldb
+      - vault
+      - redis
+    entrypoint: /bin/sh
+
+  patient-service:
+    container_name: patient-service
+    build: ./patient-service
+    restart: on-failure
+    networks:
+      - spring-boot-microservices-network
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysqldb
+      - vault
+      - user-service
+    entrypoint: /bin/sh
+
+  vital-sign-service:
+    container_name: vital-sign-service
+    build: ./vital-sign-service
+    restart: on-failure
+    networks:
+      - spring-boot-microservices-network
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysqldb
+      - vault
+      - user-service
+      - patient-service
+    entrypoint: /bin/sh
+
+networks:
+   spring-boot-microservices-network:
+     driver: bridge
+
+volumes:
+        db_data: {}

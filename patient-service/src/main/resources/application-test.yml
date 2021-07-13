@@ -3,8 +3,14 @@ server:
    port: 8082
 
 spring:
+   cloud:
+      consul:
+        config:
+           format: yaml
    config:
-      import: vault://hospitalmanagementsystem/test
+      import: 
+       - vault://secret/hospitalmanagementsystem/test
+       - consul:localhost:8500
    datasource:
       username: ${dbusername}
       password: ${dbpassword}

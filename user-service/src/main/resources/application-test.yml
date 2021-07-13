@@ -3,8 +3,24 @@ server:
    port: 8081
 
 spring:
+   cloud:
+      consul:
+        config:
+           format: yaml
+      vault:
+        url: http://vault:8200
+        token: 00000000-0000-0000-0000-000000000000
+        scheme: http
+        host: vault
+        port: 8200
+        kv:
+         enabled: true
+         backend: secret
+         application-name: hospitalmanagementsystem
    config:
-      import: vault://hospitalmanagementsystem/test
+      import: 
+        - vault://secret/hospitalmanagementsystem/test
+        - consul:localhost:8500
    datasource:
       username: ${dbusername}
       password: ${dbpassword}

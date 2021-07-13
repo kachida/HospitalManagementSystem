@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,7 @@ import io.swagger.annotations.ApiResponses;
 
 
 @RestController
+@EnableDiscoveryClient
 @RequestMapping("/usersvc")
 @Api(value="UserController", description="Operations pertaining to users in user module API")
 public class UserController {

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/vitalsignsvc")
+@EnableDiscoveryClient
 @Api(value="VitalsignController", description="Operations pertaining to vitalsigns in vitalsign module API")
 public class VitalsignController {
 

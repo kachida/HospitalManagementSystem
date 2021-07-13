@@ -121,6 +121,10 @@
 			<artifactId>micrometer-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-consul-all</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
@@ -135,6 +139,13 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			 <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-consul-dependencies</artifactId>
+            <version>3.0.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
 		</dependencies>
 	</dependencyManagement>
 

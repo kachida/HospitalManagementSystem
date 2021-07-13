@@ -4,18 +4,23 @@ spring:
   profiles:
     active: '@activatedProfile@' 
   cloud:
+      consul:
+        config:
+          format: yaml
       vault:
         url: http://localhost:8200
-        token: s.q5cEyiJoNoHdwoULn3dr2aeA
+        token: 00000000-0000-0000-0000-000000000000
         scheme: http
         host: localhost
         port: 8200
         kv:
          enabled: true
-         backend: vaultdemo
+         backend: secret
          application-name: hospitalmanagementsystem
   config:
-     import: vault://hospitalmanagementsystem
+     import: 
+       - vault://secret/hospitalmanagementsystem
+       - consul:localhost:8500
   jpa:
     hibernate:
       ddl-auto: none
