@@ -4,14 +4,11 @@ spring:
   profiles:
     active: '@activatedProfile@' 
   cloud:
-      consul:
-        config:
-           format: yaml
       vault:
-        url: http://localhost:8200
+        url: http://vault:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: localhost
+        host: vault
         port: 8200
         kv:
          enabled: true
@@ -19,9 +16,16 @@ spring:
          application-name: hospitalmanagementsystem
   config:
      import: 
-       - vault://secret/hospitalmanagementsystem
-       - consul:localhost:8500
+       - vault://secret/hospitalmanagementsystem/test
+  datasource:
+      username: ${dbusername}
+      password: ${dbpassword}
+      url: ${dbjdbcurl}
   jpa:
+    properties:
+        hibernate:
+          dialect: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
       naming:
