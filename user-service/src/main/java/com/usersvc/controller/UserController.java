@@ -40,7 +40,6 @@ import io.swagger.annotations.ApiResponses;
 
 
 @RestController
-@EnableDiscoveryClient
 @RequestMapping("/usersvc")
 @Api(value="UserController", description="Operations pertaining to users in user module API")
 public class UserController {

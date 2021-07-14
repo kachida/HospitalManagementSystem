@@ -1,75 +1,74 @@
 version: '3'
 services:
-  consul:
-    image: consul:1.7
-    networks:
-      - spring-boot-microservices-network
   mysqldb:
     image: mysql:8.0
     restart: always
     container_name: mysqldb
+    networks:
+      - microservices-network
     ports:
       - "3306:3306"
     expose:
       - "3306"
     environment:
       MYSQL_DATABASE: usersvc
-    networks:
-      - spring-boot-microservices-network
+      MYSQL_ROOT_PASSWORD: root
     volumes:
             - db_data:/var/lib/mysql
+    depends_on:
+       - vault
+       - setup-vault
   
   redis:
    container_name: redis
    image: redis:6-alpine
-   hostname: redis
    networks:
-      - spring-boot-microservices-network
+      - microservices-network
+   hostname: redis
    ports: 
     - "6379:6379"
 
   vault:
-    image: vault
-    container_name: vault
+    image: vault:1.7.3
     networks:
-      - spring-boot-microservices-network
-    cap_add:
-      - IPC_LOCK
+      - microservices-network
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: 00000000-0000-0000-0000-000000000000
-      VAULT_DEV_TOKEN: 00000000-0000-0000-0000-000000000000
-      VAULT_TOKEN: 00000000-0000-0000-0000-000000000000
-      VAULT_ADDR: 'http://vault:8200'
+      VAULT_ADDR: http://vault:8200
     ports:
       - 8200:8200
+    cap_add:
+      - IPC_LOCK
 
+  #This container will stop as soon as the vault-setup script gets completed
   setup-vault:
-    image: vault
-    container_name: setup_vault
-    entrypoint: /bin/sh
+    image: vault:1.7.3
     networks:
-      - spring-boot-microservices-network
-    volumes:
-      - './config:/config'
-    environment:
-      VAULT_ADDR: 'http://vault:8200'
-      CONFIG_ADDR: '/config'
-    command:  -c " /config/vault-init.sh; "
+      - microservices-network
     depends_on:
       - vault
+    volumes:
+      - ./scripts:/scripts
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_DEV_ROOT_TOKEN_ID: 00000000-0000-0000-0000-000000000000
+      VAULT_TOKEN: 00000000-0000-0000-0000-000000000000
+      CONFIG_ADDR: '/config'
+    entrypoint: /scripts/vault-setup.sh
 
   user-service:
     container_name: user-service
     build: ./user-service
     restart: on-failure
     networks:
-      - spring-boot-microservices-network
+      - microservices-network
     ports:
       - "8081:8081"
     depends_on:
       - mysqldb
       - vault
       - redis
+      - setup-vault
     entrypoint: /bin/sh
 
   patient-service:
@@ -77,13 +76,14 @@ services:
     build: ./patient-service
     restart: on-failure
     networks:
-      - spring-boot-microservices-network
+      - microservices-network
     ports:
       - "8082:8082"
     depends_on:
       - mysqldb
       - vault
       - user-service
+      - setup-vault
     entrypoint: /bin/sh
 
   vital-sign-service:
@@ -91,7 +91,7 @@ services:
     build: ./vital-sign-service
     restart: on-failure
     networks:
-      - spring-boot-microservices-network
+      - microservices-network
     ports:
       - "8083:8083"
     depends_on:
@@ -99,10 +99,11 @@ services:
       - vault
       - user-service
       - patient-service
+      - setup-vault
     entrypoint: /bin/sh
 
 networks:
-   spring-boot-microservices-network:
+   microservices-network:
      driver: bridge
 
 volumes:
