@@ -14,7 +14,7 @@ services:
       MYSQL_DATABASE: usersvc
       MYSQL_ROOT_PASSWORD: root
     volumes:
-            - db_data:/var/lib/mysql
+       - "./scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql"
     depends_on:
        - vault
        - setup-vault
@@ -25,6 +25,7 @@ services:
    networks:
       - microservices-network
    hostname: redis
+   command: redis-server
    ports: 
     - "6379:6379"
 
@@ -64,12 +65,13 @@ services:
       - microservices-network
     ports:
       - "8081:8081"
+    environment:
+      redis_server_addr: redis
     depends_on:
       - mysqldb
       - vault
       - redis
       - setup-vault
-    entrypoint: /bin/sh
 
   patient-service:
     container_name: patient-service
@@ -84,7 +86,6 @@ services:
       - vault
       - user-service
       - setup-vault
-    entrypoint: /bin/sh
 
   vital-sign-service:
     container_name: vital-sign-service
@@ -100,11 +101,7 @@ services:
       - user-service
       - patient-service
       - setup-vault
-    entrypoint: /bin/sh
 
 networks:
    microservices-network:
      driver: bridge
-
-volumes:
-        db_data: {}
