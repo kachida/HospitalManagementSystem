@@ -3,9 +3,11 @@ server:
    port: 8083
 
 spring:
+ application:
+    name: vital-sign-service
  cloud:
    consul:
-         host: host.docker.internal
+         host: localhost
          port: 8500
          config:
            enabled: false
@@ -26,7 +28,6 @@ spring:
          backend: secret
          application-name: hospitalmanagementsystem
    config:
-      uri: http://host.docker.internal:8888
       import: 
         - vault://secret/hospitalmanagementsystem/test
    datasource:

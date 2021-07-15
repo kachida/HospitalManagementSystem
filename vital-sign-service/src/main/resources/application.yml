@@ -1,3 +1,6 @@
+server:
+   port: 8083
+
 spring:
   application:
     name: vital-sign-service
@@ -5,7 +8,7 @@ spring:
     active: '@activatedProfile@' 
   cloud:
       consul:
-         host: host.docker.internal
+         host: localhost
          port: 8500
          config:
            enabled: false
@@ -26,7 +29,6 @@ spring:
          backend: secret
          application-name: hospitalmanagementsystem
   config:
-     uri: http://host.docker.internal:8888
      import: 
        - vault://secret/hospitalmanagementsystem/test
 
@@ -43,3 +45,9 @@ spring:
       ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+management:
+   endpoints:
+       web:
+         exposure:
+             include: '*'
