@@ -1,19 +1,46 @@
+server:
+   port: 8081
+
 spring:
   application:
-    name: hospitalmanagementsystem
+    name: user-service
   profiles:
     active: '@activatedProfile@' 
   cloud:
+      consul:
+       host: localhost
+       port: 8500
+       config:
+           enabled: false
+       discovery:
+           healthCheckInterval: 15s
+           instance-id: user-service
+       load-balancer:
+          ribbon:
+            enabled: false
       vault:
-        url: http://vault:8200
+        url: http://localhost:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: vault
+        host: localhost
         port: 8200
         kv:
          enabled: true
          backend: secret
          application-name: hospitalmanagementsystem
+      redis:
+          host: localhost
+          port: 6379
+      pool:
+          max-active: 256
+          max-idle: 12
+          max-wait: 100
+          min-idle: 6
+      cache:
+          type: redis
+          redis:
+           cache-null-values: false
+           time-to-live: 6000000
   config:
      import: 
        - vault://secret/hospitalmanagementsystem/test
@@ -24,9 +51,17 @@ spring:
   jpa:
     properties:
         hibernate:
-          dialect: org.hibernate.dialect.MySQLDialect
-    database-platform: org.hibernate.dialect.MySQLDialect
+          dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: none
+      show-sql: true
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+logging:
+   level:
+     com:
+       zaxxer:
+         hikari:
+           HikariConfig: DEBUG
+   

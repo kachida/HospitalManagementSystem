@@ -1,22 +1,39 @@
+server:
+   port: 8082
+
 spring:
   application:
-    name: hospitalmanagementsystem
+    name: patient-service
   profiles:
     active: '@activatedProfile@' 
+  config:
+     import: 
+       - vault://secret/hospitalmanagementsystem/test
   cloud:
+      consul:
+         host: localhost
+         port: 8500
+         config:
+           enabled: false
+         discovery:
+           healthCheckInterval: 15s
+           instance-id: patient-service
+         load-balancer:
+           ribbon:
+             enabled: false
       vault:
-        url: http://vault:8200
+        url: http://localhost:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: vault
+        host: localhost
         port: 8200
         kv:
          enabled: true
          backend: secret
          application-name: hospitalmanagementsystem
-  config:
-     import: 
-       - vault://secret/hospitalmanagementsystem/test
+      config:
+        import: 
+           - vault://secret/hospitalmanagementsystem/test
   datasource:
       username: ${dbusername}
       password: ${dbpassword}

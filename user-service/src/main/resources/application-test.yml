@@ -3,12 +3,25 @@ server:
    port: 8081
 
 spring:
+ application:
+    name: user-service
  cloud:
+   consul:
+       host: localhost
+       port: 8500
+       config:
+           enabled: false
+       discovery:
+           healthCheckInterval: 15s
+           instance-id: user-service
+       load-balancer:
+          ribbon:
+            enabled: false
    vault:
-        url: http://vault:8200
+        url: http://localhost:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: vault
+        host: localhost
         port: 8200
         kv:
          enabled: true
@@ -21,14 +34,26 @@ spring:
       username: ${dbusername}
       password: ${dbpassword}
       url: ${dbjdbcurl}
+      platform: mysql
+      initialization-mode: always
+      initialize: true
+
+
    redis:
-      host: redis
-      port: 6379
+          host: localhost
+          port: 6379
+          database: 0
+          timeout: 100
+   pool:
+          max-active: 256
+          max-idle: 12
+          max-wait: 100
+          min-idle: 6
    cache:
       redis:
         cache-null-values: false
         time-to-live: 6000000
-        
+
 
 api:
    username: ${api_username}

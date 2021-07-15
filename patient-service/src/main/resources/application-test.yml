@@ -3,12 +3,25 @@ server:
    port: 8082
 
 spring:
+ application:
+    name: patient-service
  cloud:
+   consul:
+         host: localhost
+         port: 8500
+         config:
+           enabled: false
+         discovery:
+           healthCheckInterval: 15s
+           instance-id: patient-service
+         load-balancer:
+           ribbon:
+             enabled: false
    vault:
-        url: http://vault:8200
+        url: http://localhost:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: vault
+        host: localhost
         port: 8200
         kv:
          enabled: true
@@ -20,11 +33,16 @@ spring:
    datasource:
       username: ${dbusername}
       password: ${dbpassword}
-      url: ${dbjdbcurl}
-        
+      url: ${dbjdbcurl}   
 
 api:
    username: ${api_username}
    password: ${api_password}
    secretKey: ${secret_key}
    userServiceAccessToken: ${userServiceAccessToken}
+
+management:
+   endpoints:
+       web:
+         exposure:
+             include: '*'

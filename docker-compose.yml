@@ -19,13 +19,27 @@ services:
        - vault
        - setup-vault
   
+  consul:
+    image: consul
+    container_name: consul_container
+    restart: always
+    command: agent -dev -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
+    networks:
+      - microservices-network
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+    ports:
+      - 8400:8400
+      - 8500:8500
+      - 8600:8600
+
   redis:
    container_name: redis
-   image: redis:6-alpine
+   image: redis
    networks:
       - microservices-network
    hostname: redis
-   command: redis-server
+   command: [ "redis-server", "--protected-mode", "no" ]
    ports: 
     - "6379:6379"
 
@@ -60,39 +74,52 @@ services:
   user-service:
     container_name: user-service
     build: ./user-service
-    restart: on-failure
+    restart: always
     networks:
       - microservices-network
     ports:
       - "8081:8081"
     environment:
-      redis_server_addr: redis
+      - spring_cloud_discovery_enabled=true
+      - spring_cloud_service-registry_auto-registration_enabled=true
+      - spring_cloud_consul_discovery_enabled=true
+      - spring_cloud_consul_config_enabled=true
+      - spring_cloud_consul_host=consul_container
+      - spring_cloud_consul_port=8500
+      - spring_cloud_consul_discovery_prefer-ip-address=true
+      - spring_cloud_consul_discovery_scheme=http
     depends_on:
       - mysqldb
       - vault
       - redis
       - setup-vault
+      - consul
 
   patient-service:
     container_name: patient-service
     build: ./patient-service
-    restart: on-failure
+    restart: always
     networks:
       - microservices-network
     ports:
       - "8082:8082"
+    environment:
+      spring.cloud.consul.host: consul
     depends_on:
       - mysqldb
       - vault
       - user-service
       - setup-vault
+      - consul
 
   vital-sign-service:
     container_name: vital-sign-service
     build: ./vital-sign-service
-    restart: on-failure
+    restart: always
     networks:
       - microservices-network
+    environment:
+      spring.cloud.consul.host: consul
     ports:
       - "8083:8083"
     depends_on:
@@ -101,7 +128,8 @@ services:
       - user-service
       - patient-service
       - setup-vault
+      - consul
 
 networks:
    microservices-network:
-     driver: bridge
+      driver: bridge

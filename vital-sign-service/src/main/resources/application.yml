@@ -1,22 +1,35 @@
 spring:
   application:
-    name: hospitalmanagementsystem
+    name: vital-sign-service
   profiles:
     active: '@activatedProfile@' 
   cloud:
+      consul:
+         host: host.docker.internal
+         port: 8500
+         config:
+           enabled: false
+         discovery:
+           healthCheckInterval: 15s
+           instance-id: vital-sign-service
+         load-balancer:
+           ribbon:
+             enabled: false
       vault:
-        url: http://vault:8200
+        url: http://localhost:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: vault
+        host: localhost
         port: 8200
         kv:
          enabled: true
          backend: secret
          application-name: hospitalmanagementsystem
   config:
+     uri: http://host.docker.internal:8888
      import: 
        - vault://secret/hospitalmanagementsystem/test
+
   datasource:
       username: ${dbusername}
       password: ${dbpassword}
