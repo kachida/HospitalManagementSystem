@@ -21,7 +21,7 @@ services:
   
   consul:
     image: consul
-    container_name: consul_container
+    container_name: consul
     restart: always
     command: agent -dev -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
     networks:
@@ -35,7 +35,7 @@ services:
 
   redis:
    container_name: redis
-   image: redis
+   image: redis:6.2.4-alpine
    networks:
       - microservices-network
    hostname: redis
@@ -84,7 +84,7 @@ services:
       - spring_cloud_service-registry_auto-registration_enabled=true
       - spring_cloud_consul_discovery_enabled=true
       - spring_cloud_consul_config_enabled=true
-      - spring_cloud_consul_host=consul_container
+      - spring_cloud_consul_host=consul
       - spring_cloud_consul_port=8500
       - spring_cloud_consul_discovery_prefer-ip-address=true
       - spring_cloud_consul_discovery_scheme=http

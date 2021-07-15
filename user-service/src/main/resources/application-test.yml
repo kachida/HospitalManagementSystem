@@ -7,10 +7,12 @@ spring:
     name: user-service
  cloud:
    consul:
-       host: localhost
+       host: http://consul
        port: 8500
        config:
            enabled: false
+           import-check:
+                enabled: false
        discovery:
            healthCheckInterval: 15s
            instance-id: user-service
@@ -18,10 +20,10 @@ spring:
           ribbon:
             enabled: false
    vault:
-        url: http://localhost:8200
+        url: http://vault:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: localhost
+        host: vault
         port: 8200
         kv:
          enabled: true
@@ -40,7 +42,7 @@ spring:
 
 
    redis:
-          host: localhost
+          host: redis
           port: 6379
           database: 0
           timeout: 100
@@ -61,6 +63,9 @@ api:
    secretKey: ${secret_key}
 
 management:
+   health:
+     redis:
+      enabled: false
    endpoints:
        web:
          exposure:

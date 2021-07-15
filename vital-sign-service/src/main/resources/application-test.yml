@@ -7,7 +7,7 @@ spring:
     name: vital-sign-service
  cloud:
    consul:
-         host: localhost
+         host: http://consul
          port: 8500
          config:
            enabled: false
@@ -18,10 +18,10 @@ spring:
            ribbon:
              enabled: false
    vault:
-        url: http://localhost:8200
+        url: http://vault:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: localhost
+        host: vault
         port: 8200
         kv:
          enabled: true

@@ -8,29 +8,37 @@ spring:
     active: '@activatedProfile@' 
   cloud:
       consul:
-       host: localhost
+       host: http://consul
        port: 8500
        config:
            enabled: false
+           import-check:
+                enabled: false
        discovery:
            healthCheckInterval: 15s
-           instance-id: user-service
+           instance-id: user-service.4
        load-balancer:
-          ribbon:
-            enabled: false
+           ribbon:
+             enabled: false
       vault:
-        url: http://localhost:8200
+        url: http://vault:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: localhost
+        host: vault
         port: 8200
         kv:
          enabled: true
          backend: secret
          application-name: hospitalmanagementsystem
       redis:
-          host: localhost
+          host: redis
           port: 6379
+          jedis:
+             pool:
+               max-active: 7
+               max-idle: 7
+               min-idle: 2
+               max-wait: -1ms
       pool:
           max-active: 256
           max-idle: 12
@@ -57,11 +65,3 @@ spring:
       show-sql: true
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
-logging:
-   level:
-     com:
-       zaxxer:
-         hikari:
-           HikariConfig: DEBUG
-   
