@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.vitalsignsvc.models.Patient;
 
-@FeignClient(name="patient-svc-client" , url="http://localhost:8082", configuration = PatientServiceClientConfiguration.class)
+@FeignClient(name="patient-service" , url="http://localhost:8082", configuration = PatientServiceClientConfiguration.class)
 public interface PatientServiceClient {
 
 	@GetMapping("/patientsvc/patients/{id}")

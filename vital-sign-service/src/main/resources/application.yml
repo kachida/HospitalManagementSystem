@@ -4,9 +4,10 @@ server:
 spring:
   application:
     name: vital-sign-service
-  profiles:
-    active: '@activatedProfile@' 
   cloud:
+      loadbalancer:
+         ribbon:
+           enabled: false
       consul:
          host: http://consul
          port: 8500
@@ -28,9 +29,6 @@ spring:
          enabled: true
          backend: secret
          application-name: hospitalmanagementsystem
-  config:
-     import: 
-       - vault://secret/hospitalmanagementsystem/test
 
   datasource:
       username: ${dbusername}
@@ -51,3 +49,10 @@ management:
        web:
          exposure:
              include: '*'
+
+api:
+   username: ${api_username}
+   password: ${api_password}
+   secretKey: ${secret_key}
+   userServiceAccessToken: ${userServiceAccessToken}
+   patientServiceAccessToken: ${patientServiceAccessToken}

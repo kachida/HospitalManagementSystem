@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.vitalsignsvc.models.User;
 
-@FeignClient(name="user-svc-client" , url="http://localhost:8081", configuration = UserServiceClientConfiguration.class)
+@FeignClient(name="user-service" , url="http://localhost:8081", configuration = UserServiceClientConfiguration.class)
 public interface UserServiceClient {
 
 	@GetMapping("/usersvc/users/{id}")

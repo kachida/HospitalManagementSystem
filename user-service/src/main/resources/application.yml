@@ -4,8 +4,6 @@ server:
 spring:
   application:
     name: user-service
-  profiles:
-    active: '@activatedProfile@' 
   cloud:
       consul:
        host: http://consul
@@ -49,13 +47,14 @@ spring:
           redis:
            cache-null-values: false
            time-to-live: 6000000
-  config:
-     import: 
-       - vault://secret/hospitalmanagementsystem/test
   datasource:
       username: ${dbusername}
       password: ${dbpassword}
       url: ${dbjdbcurl}
+      platform: mysql
+      initialization-mode: always
+      initialize: true
+
   jpa:
     properties:
         hibernate:
@@ -65,3 +64,17 @@ spring:
       show-sql: true
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+api:
+   username: ${api_username}
+   password: ${api_password}
+   secretKey: ${secret_key}
+
+management:
+   health:
+     redis:
+      enabled: false
+   endpoints:
+       web:
+         exposure:
+             include: '*'

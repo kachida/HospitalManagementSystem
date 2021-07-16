@@ -11,9 +11,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Setter;
 
 @Data
 @AllArgsConstructor
@@ -44,6 +49,7 @@ public class Patient {
 	
 	@Column(name="date_of_visit")
 	@ApiModelProperty(notes = "date of visit")
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	Timestamp dateofvisit;
 	
 	@Column(name="user_id")

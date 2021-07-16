@@ -9,6 +9,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +31,7 @@ public class Role implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@ApiModelProperty(notes = "The database generated user ID")
 	@Column(name="role_id")
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private long id;
 	@ApiModelProperty(notes = "role name")
 	@Column(name="name")

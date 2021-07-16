@@ -7,6 +7,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +17,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Entity
 @Table(name="vitalsign")
+@JsonIgnoreProperties({ "id" })
 public class Vitalsign {
 	
 	@Id

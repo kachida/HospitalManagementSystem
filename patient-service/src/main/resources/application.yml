@@ -4,12 +4,10 @@ server:
 spring:
   application:
     name: patient-service
-  profiles:
-    active: '@activatedProfile@' 
-  config:
-     import: 
-       - vault://secret/hospitalmanagementsystem/test
   cloud:
+      loadbalancer:
+         ribbon:
+           enabled: false
       consul:
          host: http://consul
          port: 8500
@@ -31,9 +29,6 @@ spring:
          enabled: true
          backend: secret
          application-name: hospitalmanagementsystem
-      config:
-        import: 
-           - vault://secret/hospitalmanagementsystem/test
   datasource:
       username: ${dbusername}
       password: ${dbpassword}
@@ -47,3 +42,15 @@ spring:
       ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+management:
+   endpoints:
+       web:
+         exposure:
+             include: '*'
+
+api:
+   username: ${api_username}
+   password: ${api_password}
+   secretKey: ${secret_key}
+   userServiceAccessToken: ${userServiceAccessToken}
