@@ -1,9 +1,7 @@
 # Hospital Management System
 Backend example for implementing through Spring Boot and microservices.
 
-This project is an cloud application example using spring boot and other components such as Docker, Hashicorp vault, consul , swagger , feign , zipkin, mongodb, kafka, elasticsearch, ELK stack, atlassian clover.
-
-This application is example of implementation of back-end example using  spring boot and other components in microservices architecture.
+This application is example of implementation of back-end example using  spring boot and other components such as Docker, Hashicorp vault, consul , swagger , feign , zipkin, mongodb, kafka, elasticsearch, ELK stack, atlassian clover.
 
 Prerequisites and Technologies
 
