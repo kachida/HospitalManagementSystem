@@ -11,11 +11,12 @@ import feign.RequestInterceptor;
 
 public class PatientServiceClientConfiguration {
 	
-	@Autowired
-	YamlProperties yamlProperties;
+	private final YamlProperties yamlProperties;
+	public PatientServiceClientConfiguration(YamlProperties yamlProperties) {
+		super();
+		this.yamlProperties = yamlProperties;
+	}
 
-	
-	
 	@Bean
 	public RequestInterceptor bearerTokenRequestInterceptor() {
 		return new RequestInterceptor() {

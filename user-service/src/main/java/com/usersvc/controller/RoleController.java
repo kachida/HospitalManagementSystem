@@ -3,9 +3,6 @@ package com.usersvc.controller;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +19,7 @@ import com.usersvc.aspect.Loggable;
 import com.usersvc.models.Role;
 import com.usersvc.models.User;
 import com.usersvc.service.IRoleService;
+import com.usersvc.service.RoleServiceImpl;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -31,8 +29,11 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/rolesvc")
 public class RoleController {
 
-	@Autowired
-	IRoleService roleService;
+	private final RoleServiceImpl roleService;
+	public RoleController(RoleServiceImpl roleService)
+	{
+		this.roleService = roleService;
+	}
 
 	// fetch all roles
 	@GetMapping("/roles")

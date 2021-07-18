@@ -18,12 +18,18 @@ import com.patientsvc.service.MyUserDetailService;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
-	@Autowired
-	MyUserDetailService userDetailsSvc;
 	
-	@Autowired
-	JwtRequestFilter jwtRequestFilter;
+	private final MyUserDetailService userDetailsSvc;
+	private final JwtRequestFilter jwtRequestFilter;
 	
+	
+	
+	public SecurityConfiguration(MyUserDetailService userDetailsSvc, JwtRequestFilter jwtRequestFilter) {
+		super();
+		this.userDetailsSvc = userDetailsSvc;
+		this.jwtRequestFilter = jwtRequestFilter;
+	}
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception 
 	{

@@ -40,19 +40,24 @@ import io.swagger.annotations.ApiResponses;
 @Api(value="VitalsignController", description="Operations pertaining to vitalsigns in vitalsign module API")
 public class VitalsignController {
 
-	@Autowired
-	IVitalsignService vitalsignService;
 	
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	
-	@Autowired
-	private MyUserDetailService userDetailsService;
-	
-	@Autowired
-	private JwtUtil jwtUtilToken;
+	private final IVitalsignService vitalsignService;
+	private final AuthenticationManager authenticationManager;
+	private final MyUserDetailService userDetailsService;
+	private final JwtUtil jwtUtilToken;
 	
 	
+	
+	
+	public VitalsignController(IVitalsignService vitalsignService, AuthenticationManager authenticationManager,
+			MyUserDetailService userDetailsService, JwtUtil jwtUtilToken) {
+		super();
+		this.vitalsignService = vitalsignService;
+		this.authenticationManager = authenticationManager;
+		this.userDetailsService = userDetailsService;
+		this.jwtUtilToken = jwtUtilToken;
+	}
+
 	// fetch all vitalsign records
 		@GetMapping("/vitalsign")
 		@Loggable

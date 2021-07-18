@@ -14,8 +14,14 @@ import com.vitalsignsvc.models.YamlProperties;
 @Service
 public class MyUserDetailService implements UserDetailsService {
 	
-	@Autowired
-	YamlProperties yamlProps;
+	
+	private final YamlProperties yamlProps;
+	public MyUserDetailService(YamlProperties yamlProps) {
+		super();
+		this.yamlProps = yamlProps;
+	}
+
+
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

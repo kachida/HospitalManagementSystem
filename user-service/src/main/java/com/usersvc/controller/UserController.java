@@ -45,20 +45,21 @@ import io.swagger.annotations.ApiResponses;
 public class UserController {
 	
 
-	@Autowired
-	MeterRegistry meterRegistry;
 	
-	@Autowired
-	private IUserService userService;
+	private final MeterRegistry meterRegistry;
+	private final IUserService userService;
+	private final AuthenticationManager authenticationManager;
+	private final MyUserDetailService userDetailsService;
+	private final JwtUtil jwtUtilToken;
 	
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	
-	@Autowired
-	private MyUserDetailService userDetailsService;
-	
-	@Autowired
-	private JwtUtil jwtUtilToken;
+	public UserController(MeterRegistry meterRegistry,IUserService userService,AuthenticationManager authenticationManager,MyUserDetailService userDetailsService, JwtUtil jwtUtilToken)
+	{
+		this.meterRegistry= meterRegistry;
+		this.userService= userService;
+		this.authenticationManager= authenticationManager;
+		this.userDetailsService = userDetailsService;
+		this.jwtUtilToken = jwtUtilToken;
+	}
 	
 	//fetch all users pagination supported
 	@GetMapping("/users")

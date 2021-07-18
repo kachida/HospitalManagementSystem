@@ -20,12 +20,20 @@ import com.patientsvc.service.MyUserDetailService;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-	@Autowired
-	private MyUserDetailService userDetailsService;
 	
-	@Autowired
-	private JwtUtil jwtUtil;
+	private final MyUserDetailService userDetailsService;
+	private final JwtUtil jwtUtil;
 	
+	
+	
+	public JwtRequestFilter(MyUserDetailService userDetailsService, JwtUtil jwtUtil) {
+		super();
+		this.userDetailsService = userDetailsService;
+		this.jwtUtil = jwtUtil;
+	}
+
+
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {

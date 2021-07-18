@@ -18,12 +18,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class JwtUtil {
 	
-	@Autowired
-	YamlProperties yamlProps;
-	
-	
-	//private String SECRET_KEY = yamlProps.getSecret_key();
-	
+	private final YamlProperties yamlProps;
+	public JwtUtil(YamlProperties yamlProps) {
+		super();
+		this.yamlProps = yamlProps;
+	}
+
 	public String extractUsername(String token)
 	{
 		return extractClaim(token, Claims::getSubject);

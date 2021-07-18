@@ -29,11 +29,16 @@ public class PatientServiceImpl implements IPatientService {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-	@Autowired
-	IPatientRepository patientRepository;
 	
-	@Autowired
-	UserServiceClient userServiceClient;
+	private final IPatientRepository patientRepository;
+	private final UserServiceClient userServiceClient;
+
+	public PatientServiceImpl( IPatientRepository patientRepository,
+			UserServiceClient userServiceClient) {
+		super();
+		this.patientRepository = patientRepository;
+		this.userServiceClient = userServiceClient;
+	}
 
 	//fetch all patients 
 	@Override

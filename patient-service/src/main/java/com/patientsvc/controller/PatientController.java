@@ -41,17 +41,19 @@ import io.swagger.annotations.ApiResponses;
 @Api(value="PatientController", description="Operations pertaining to patients in patient module API")
 public class PatientController {
 
-	@Autowired
-	IPatientService patientService;
+	private final IPatientService patientService;
+	private final AuthenticationManager authenticationManager;
+	private final MyUserDetailService userDetailsService;
+	private final JwtUtil jwtUtilToken;
 	
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	
-	@Autowired
-	private MyUserDetailService userDetailsService;
-	
-	@Autowired
-	private JwtUtil jwtUtilToken;
+	public PatientController(IPatientService patientService, AuthenticationManager authenticationManager,
+			MyUserDetailService userDetailsService, JwtUtil jwtUtilToken) {
+		super();
+		this.patientService = patientService;
+		this.authenticationManager = authenticationManager;
+		this.userDetailsService = userDetailsService;
+		this.jwtUtilToken = jwtUtilToken;
+	}
 
 	// fetch all patients
 	@GetMapping("/patients")

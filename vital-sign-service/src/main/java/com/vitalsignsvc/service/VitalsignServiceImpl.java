@@ -31,15 +31,18 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Autowired
-	IVitalsignRepository vitalsignRepository;
-
-
-	@Autowired
-	PatientServiceClient patientServiceClient;
-
-	@Autowired
-	UserServiceClient userServiceClient;
+	
+	private final IVitalsignRepository vitalsignRepository;
+	private final PatientServiceClient patientServiceClient;
+	private final UserServiceClient userServiceClient;
+	
+	public VitalsignServiceImpl( IVitalsignRepository vitalsignRepository,
+			PatientServiceClient patientServiceClient, UserServiceClient userServiceClient) {
+		super();
+		this.vitalsignRepository = vitalsignRepository;
+		this.patientServiceClient = patientServiceClient;
+		this.userServiceClient = userServiceClient;
+	}
 
 	// fetch all vitalsign records
 	@Override

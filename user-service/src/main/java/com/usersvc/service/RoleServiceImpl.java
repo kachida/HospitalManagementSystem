@@ -22,8 +22,13 @@ import com.usersvc.repository.IRoleRepository;
 @Service
 public class RoleServiceImpl implements IRoleService{
 	
-	@Autowired
-	private IRoleRepository roleRepository;
+	
+	private final IRoleRepository roleRepository;
+	
+	public RoleServiceImpl(IRoleRepository roleRepository)
+	{
+		this.roleRepository = roleRepository;
+	}
 	
 	
 	//Get All roles

@@ -10,9 +10,12 @@ import feign.RequestTemplate;
 
 public class UserServiceClientConfiguration {
 	
-	@Autowired
-	YamlProperties yamlProperties;
+	private final YamlProperties yamlProperties;
 
+	public UserServiceClientConfiguration(YamlProperties yamlProperties)
+	{
+		this.yamlProperties = yamlProperties;
+	}
 	
 	
 	@Bean

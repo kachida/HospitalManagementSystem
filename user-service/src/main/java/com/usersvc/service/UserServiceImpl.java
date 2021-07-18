@@ -28,11 +28,12 @@ import com.usersvc.repository.IUserRepository;
 
 @Service
 public class UserServiceImpl implements IUserService{
-	
 
-	
-	@Autowired
-	private IUserRepository userRepository;
+	private final IUserRepository userRepository;
+	public UserServiceImpl(IUserRepository userRepository)
+	{
+		this.userRepository = userRepository;
+	}
 	
 	@PersistenceContext
 	private EntityManager entityManager;

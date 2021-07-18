@@ -10,11 +10,15 @@ import feign.RequestTemplate;
 
 public class UserServiceClientConfiguration {
 	
-	@Autowired
-	YamlProperties yamlProperties;
+	private final YamlProperties yamlProperties;
 
-	
-	
+	public UserServiceClientConfiguration(YamlProperties yamlProperties) {
+		super();
+		this.yamlProperties = yamlProperties;
+	}
+
+
+
 	@Bean
 	public RequestInterceptor bearerTokenRequestInterceptor() {
 		return new RequestInterceptor() {
