@@ -55,6 +55,45 @@ services:
     cap_add:
       - IPC_LOCK
 
+  zookeeper:
+     image: wurstmeister/zookeeper
+     container_name: zookeeper
+     networks:
+      - microservices-network
+     ports:
+       - "2181:2181"
+  
+  kafka:
+     image: wurstmeister/kafka
+     container_name: kafka
+     networks:
+      - microservices-network
+     ports:
+       - "9092:9092"
+     depends_on:
+       - "zookeeper"
+     environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+   
+     volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    networks:
+      - microservices-network
+    ports:
+      - 27017:27017
+    volumes:
+      - /home/mongo/data:/data/db
+    depends_on:
+      - kafka
+
   #This container will stop as soon as the vault-setup script gets completed
   setup-vault:
     image: vault:1.7.3
@@ -94,6 +133,9 @@ services:
       - redis
       - setup-vault
       - consul
+      - zookeeper
+      - kafka
+      - mongo
 
   patient-service:
     container_name: patient-service

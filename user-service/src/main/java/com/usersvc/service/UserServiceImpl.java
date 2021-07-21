@@ -13,6 +13,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.javers.spring.annotation.JaversAuditable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -91,8 +92,9 @@ public class UserServiceImpl implements IUserService{
 	}
 	
 	//Add new user
-	@Transactional(propagation = Propagation.REQUIRED)
+	//@Transactional(propagation = Propagation.REQUIRED)
 	@Loggable
+	@JaversAuditable
 	public User addUser(User user)
 	{
 		return userRepository.save(user);
@@ -101,9 +103,11 @@ public class UserServiceImpl implements IUserService{
 	
 	//update existing user
 	@Loggable
-	@Transactional(propagation = Propagation.REQUIRES_NEW,
+	@JaversAuditable
+	/*@Transactional(propagation = Propagation.REQUIRES_NEW,
 					rollbackFor = Exception.class,
 					noRollbackFor = EntityNotFoundException.class)
+	*/
 	public Optional<User> updateUser(User updatedUser,long id)
 	{
 		Optional<User> userDetails = userRepository.findById(id);
@@ -167,17 +171,23 @@ public class UserServiceImpl implements IUserService{
 	}
 
 
+
 	//Query with Named Queries
 	@Override
 	@Loggable
 	@Transactional(readOnly = true)
 	public List<User> getUsersWithEmailIdFilter(String query, int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
+			/*
 		Query q = entityManager.createNamedQuery("User.FindByEmail");
 		q.setParameter(1, query);
 		List<User> userList=q.getResultList();
 		return userList;
+		*/
+		
+		return null;
 	}
+
 
 	//Query with Named Queries
 	@Override
@@ -186,11 +196,14 @@ public class UserServiceImpl implements IUserService{
 	public List<User> getUsersWithRoleAndUserNameFilter(String username, String role, int pageNo, int pageSize,
 			String sortBy) {
 		// TODO Auto-generated method stub
+		/*
 		Query q = entityManager.createNamedQuery("User.FindByRoleAndUsername");
 		q.setParameter(1, role);
 		q.setParameter(2, username);
 		List<User> userList=q.getResultList();
 		return userList;
+		*/
+		return null;
 	}
 
 }

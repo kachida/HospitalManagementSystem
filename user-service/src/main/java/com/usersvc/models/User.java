@@ -20,12 +20,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-@Entity
-@Table(name="user")
-@NamedQueries({
-	@NamedQuery(name="User.FindByEmail",query="FROM User WHERE email=?1"),
-	@NamedQuery(name="User.FindByRoleAndUsername",query="SELECT a FROM User a WHERE a.role=?1 AND a.username=?2")
-})
+@Entity(name="User")
+@Table(name="User")
 public class User {
 
 	@Id
