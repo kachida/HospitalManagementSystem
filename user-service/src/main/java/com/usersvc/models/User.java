@@ -20,8 +20,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-@Entity(name="User")
-@Table(name="User")
+@Entity
+@Table(name="user")
 public class User {
 
 	@Id

@@ -56,15 +56,18 @@ services:
       - IPC_LOCK
 
   zookeeper:
-     image: wurstmeister/zookeeper
+     image: confluentinc/cp-zookeeper:latest
      container_name: zookeeper
      networks:
       - microservices-network
      ports:
        - "2181:2181"
+     environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
   
   kafka:
-     image: wurstmeister/kafka
+     image: confluentinc/cp-kafka:latest
      container_name: kafka
      networks:
       - microservices-network
@@ -73,13 +76,16 @@ services:
      depends_on:
        - "zookeeper"
      environment:
-      KAFKA_ADVERTISED_HOST_NAME: kafka
-      KAFKA_ADVERTISED_PORT: 9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-   
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "USER_CREATE:1:1, USER_UPDATE:1:1, USER_DELETE:1:1"
      volumes:
-       - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
 
   mongo:
     image: mongo
@@ -88,9 +94,7 @@ services:
     networks:
       - microservices-network
     ports:
-      - 27017:27017
-    volumes:
-      - /home/mongo/data:/data/db
+      - "27017:27017"
     depends_on:
       - kafka
 
@@ -113,7 +117,6 @@ services:
   user-service:
     container_name: user-service
     build: ./user-service
-    restart: always
     networks:
       - microservices-network
     ports:
@@ -127,6 +130,10 @@ services:
       - spring_cloud_consul_port=8500
       - spring_cloud_consul_discovery_prefer-ip-address=true
       - spring_cloud_consul_discovery_scheme=http
+      - spring_kafka_bootstrap-servers=kafka:9092
+      - spring_data_mongodb_host=mongo
+      - spring_data_mongodb_port=27017
+      - spring_data_mongodb_database=user
     depends_on:
       - mysqldb
       - vault

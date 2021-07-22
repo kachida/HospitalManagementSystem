@@ -29,7 +29,7 @@ spring:
          backend: secret
          application-name: hospitalmanagementsystem
       redis:
-          host: localhost
+          host: redis
           port: 6379
           jedis:
              pool:
@@ -72,13 +72,12 @@ spring:
       port: 27017
 
   kafka:
+    bootstrap-servers: kakfa:9092
     producer:
-       bootstrap-servers: kakfa:9092
        key-serializer: org.apache.kafka.common.serialization.StringSerializer
        value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
-       bootstrap-servers: kakfa:9092
-       group-id: user-group-id
+       group-id: group_id
        auto-offset-reset: earliest
        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
        value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -96,6 +95,8 @@ api:
 management:
    health:
      redis:
+      enabled: false
+     mongo:
       enabled: false
    endpoints:
        web:

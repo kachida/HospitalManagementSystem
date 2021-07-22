@@ -15,20 +15,19 @@ public class UserAuditConsumerService {
 		this.userAuditRepository = userAuditRepository;
 	}
 
-	@KafkaListener(topics="USER_CREATE", groupId="user-group-id")
+	@KafkaListener(topics="USER_CREATE", groupId="group_id")
 	public void userCreateConsumer(UserAudit userAuditMessage)
 	{
 		userAuditRepository.save(userAuditMessage);
-		System.out.println("consumed message ->" + userAuditMessage.toString());
 	}
 	
-	@KafkaListener(topics="USER_UPDATE", groupId="user-group-id")
+	@KafkaListener(topics="USER_UPDATE", groupId="group_id")
 	public void userUpdateConsumer(UserAudit userAuditMessage)
 	{
 		userAuditRepository.save(userAuditMessage);
 	}
 	
-	@KafkaListener(topics="USER_DELETE", groupId="user-group-id")
+	@KafkaListener(topics="USER_DELETE", groupId="group_id")
 	public void userDeleteConsumer(UserAudit userAuditMessage)
 	{
 		userAuditRepository.save(userAuditMessage);
