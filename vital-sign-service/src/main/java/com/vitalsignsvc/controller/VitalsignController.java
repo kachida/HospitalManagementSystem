@@ -35,7 +35,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
-@RequestMapping("/vitalsignsvc")
+@RequestMapping("/vitalsigns")
 @EnableDiscoveryClient
 @Api(value="VitalsignController", description="Operations pertaining to vitalsigns in vitalsign module API")
 public class VitalsignController {
@@ -59,7 +59,7 @@ public class VitalsignController {
 	}
 
 	// fetch all vitalsign records
-		@GetMapping("/vitalsign")
+		@GetMapping("/")
 		@Loggable
 		@ApiOperation(value = "Retrieve all vitalsign records with pagination and sorting supported", produces = "application/json")
 		@ApiResponses(value = {
@@ -73,7 +73,7 @@ public class VitalsignController {
 		}
 
 		// fetch vitalsign record by id
-		@GetMapping("/vitalsign/{id}")
+		@GetMapping("/{id}")
 		@Loggable
 		@ApiOperation(value = "Retrieve vitalsign details with given id", produces = "application/json")
 		@ApiResponses(value = {
@@ -86,7 +86,7 @@ public class VitalsignController {
 		}
 
 		// create new vitalsign record
-		@PostMapping("/createvitalsign/{id}")
+		@PostMapping("/{id}")
 		@Loggable
 		@ApiOperation(value = "To create a new vitalsign record", produces = "application/json")
 		@ApiResponses(value = {
@@ -98,7 +98,7 @@ public class VitalsignController {
 		}
 
 		// update existing vitalsign record
-		@PutMapping("/vitalsign/{id}")
+		@PutMapping("/{id}")
 		@Loggable
 		@ApiOperation(value = "To update the existing  vitalsign record", produces = "application/json")
 		@ApiResponses(value = {
@@ -116,7 +116,7 @@ public class VitalsignController {
 		}
 
 		// delete vitalsign record
-		@DeleteMapping("/vitalsign/{id}")
+		@DeleteMapping("/{id}")
 		@Loggable
 		@ApiOperation(value = "To delete the existing  vitalsign record", produces = "application/json")
 		@ApiResponses(value = {

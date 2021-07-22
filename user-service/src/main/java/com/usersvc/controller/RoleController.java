@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
-@RequestMapping("/rolesvc")
+@RequestMapping("/roles")
 public class RoleController {
 
 	private final RoleServiceImpl roleService;
@@ -36,7 +36,7 @@ public class RoleController {
 	}
 
 	// fetch all roles
-	@GetMapping("/roles")
+	@GetMapping("/")
 	@Loggable
 	@ApiOperation(value = "Retrieve All Roles", produces = "application/json")
 	@ApiResponses(value = {
@@ -49,7 +49,7 @@ public class RoleController {
 	}
 
 	// fetch roles by id
-	@GetMapping("/roles/{id}")
+	@GetMapping("/{id}")
 	@Loggable
 	@ApiOperation(value = "Retrieve role details by role id", produces = "application/json")
 	@ApiResponses(value = {
@@ -67,7 +67,7 @@ public class RoleController {
 	}
 
 	// create new user
-	@PostMapping("/roles")
+	@PostMapping("/")
 	@Loggable
 	@ApiOperation(value = "To create a new role", produces = "application/json")
 	@ApiResponses(value = {
@@ -79,7 +79,7 @@ public class RoleController {
 	}
 
 	// update existing user
-	@PutMapping("/roles/{id}")
+	@PutMapping("/{id}")
 	@Loggable
 	@ApiOperation(value = "To update the existing  role", produces = "application/json")
 	@ApiResponses(value = {
@@ -97,7 +97,7 @@ public class RoleController {
 	}
 
 	// delete roles
-	@DeleteMapping("/roles/{id}")
+	@DeleteMapping("/{id}")
 	@Loggable
 	@ApiOperation(value = "To delete the existing  role", produces = "application/json")
 	@ApiResponses(value = {

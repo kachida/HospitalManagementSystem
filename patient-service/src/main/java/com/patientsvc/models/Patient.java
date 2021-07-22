@@ -1,6 +1,7 @@
 package com.patientsvc.models;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,9 +12,15 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -55,6 +62,24 @@ public class Patient {
 	@Column(name="user_id")
 	@ApiModelProperty(notes = "user Id")
 	long user_id;
+	
+	@Column(name="created_by")
+	String createdBy;
+	
+	@Column(name="last_modified_by")
+	String lastModifiedBy;
+	
+	@CreatedDate
+    @Column(name="created_date")
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonFormat(pattern="yyyy-MM-dd")
+    private LocalDateTime createdDate;
+	
+	@LastModifiedDate
+    @Column(name="last_modified_date")
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonFormat(pattern="yyyy-MM-dd")
+    private LocalDateTime lastModifiedDate;
 
 	public Patient() {
 		super();

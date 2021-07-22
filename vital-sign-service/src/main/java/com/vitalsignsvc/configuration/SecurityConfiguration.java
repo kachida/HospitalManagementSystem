@@ -44,7 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	protected void configure(HttpSecurity http) throws Exception
 	{
 		http.csrf().disable().authorizeRequests()
-		.antMatchers("/vitalsignsvc/authenticate").permitAll()
+		.antMatchers("/vitalsigns/authenticate").permitAll()
 		.antMatchers("/v2/api-docs",
 				"/configuration/ui",
 				"/swagger-resources/**",

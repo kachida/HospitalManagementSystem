@@ -7,6 +7,10 @@ CREATE TABLE `user` (
   `email` varchar(100) DEFAULT NULL,
   `phonenumber` varchar(50) DEFAULT NULL,
   `address` varchar(300) DEFAULT NULL,
+  `created_by` varchar(100) DEFAULT NULL,
+  `created_date` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `last_Modified_By` varchar(300) DEFAULT NULL,
+  `last_Modified_Date` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `id` (`ID`)
 );
@@ -19,6 +23,10 @@ CREATE TABLE `patient` (
   `email` varchar(30) DEFAULT NULL,
   `date_of_visit` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `user_id` int NOT NULL,
+  `created_by` varchar(100) DEFAULT NULL,
+  `created_date` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `last_Modified_By` varchar(300) DEFAULT NULL,
+  `last_Modified_Date` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 );
 
@@ -34,6 +42,10 @@ CREATE TABLE `vitalsign` (
   `user_id` int NOT NULL,
   `patient_name` varchar(255) DEFAULT NULL,
   `user_name` varchar(255) DEFAULT NULL,
+  `created_by` varchar(100) DEFAULT NULL,
+  `created_date` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `last_Modified_By` varchar(300) DEFAULT NULL,
+  `last_Modified_Date` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `fk_patient` (`patient_id`),
   CONSTRAINT `fk_patient` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`id`)
@@ -43,5 +55,9 @@ CREATE TABLE `vitalsign` (
 CREATE TABLE `roles` (
   `ROLE_ID` int NOT NULL AUTO_INCREMENT,
   `NAME` varchar(100) DEFAULT NULL,
+  `created_by` varchar(100) DEFAULT NULL,
+  `created_date` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `last_Modified_By` varchar(300) DEFAULT NULL,
+  `last_Modified_Date` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ROLE_ID`)
 );

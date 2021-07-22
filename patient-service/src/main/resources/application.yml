@@ -2,6 +2,9 @@ server:
    port: 8082
 
 spring:
+  jackson:
+     serialization:
+         write_dates_as_timestamps: false
   application:
     name: patient-service
   cloud:
@@ -33,6 +36,10 @@ spring:
       username: ${dbusername}
       password: ${dbpassword}
       url: ${dbjdbcurl}
+      hikari:
+         maximum-pool-size: 20
+         max-lifetime: 1800000
+         idle-timeout: 30000
   jpa:
     properties:
         hibernate:
@@ -54,3 +61,9 @@ api:
    password: ${api_password}
    secretKey: ${secret_key}
    userServiceAccessToken: ${userServiceAccessToken}
+
+logging:
+   level:
+     com:
+       zaxxer:
+         hikari: DEBUG

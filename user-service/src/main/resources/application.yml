@@ -1,6 +1,9 @@
 server:
    port: 8081
 
+elasticsearch:
+   connection.url: elasticsearch:9200
+
 spring:
   application:
     name: user-service
@@ -66,10 +69,15 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
   data:
+    elasticsearch:
+     cluster-name: elasticsearch
+     cluster-nodes: elasticsearch:9200
     mongo:
       host: mongo
       database: user
       port: 27017
+
+  
 
   kafka:
     bootstrap-servers: kakfa:9092
@@ -97,6 +105,8 @@ management:
      redis:
       enabled: false
      mongo:
+      enabled: false
+     elasticsearch:
       enabled: false
    endpoints:
        web:
