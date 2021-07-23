@@ -22,7 +22,6 @@ import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
 
 
 
@@ -82,10 +81,17 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
 	
 	private SecurityContext securityContext()
 	{
+		/*
 		return SecurityContext
 				.builder()
 				.securityReferences(defaultAuth())
 				.forPaths(PathSelectors.regex(DEFAULT_INCLUDE_PATTERN))
+				.build();
+		*/
+		return SecurityContext
+				.builder()
+				.securityReferences(defaultAuth())
+				.operationSelector( oc -> oc.requestMappingPattern().matches(DEFAULT_INCLUDE_PATTERN))
 				.build();
 	}
 	

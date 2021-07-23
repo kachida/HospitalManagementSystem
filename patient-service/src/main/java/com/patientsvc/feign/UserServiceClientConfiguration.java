@@ -1,6 +1,6 @@
 package com.patientsvc.feign;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.context.annotation.Bean;
 
 import com.patientsvc.models.YamlProperties;

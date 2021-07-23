@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 import javax.validation.ConstraintViolation;
 
@@ -94,6 +95,7 @@ public class ApiError {
 				);
 	}
 
+	@SuppressWarnings({"rawtypes"})
 	public void addValidationErrors(Set<ConstraintViolation<?>> constraintViolations )
 	{
 		for(ConstraintViolation constraintViolation:constraintViolations)

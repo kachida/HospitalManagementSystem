@@ -1,21 +1,20 @@
 package com.usersvc.service;
 
-import java.util.ArrayList;
+
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Optional;
-
 import javax.persistence.EntityNotFoundException;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.usersvc.aspect.Loggable;
+import com.usersvc.dto.RoleDto;
 import com.usersvc.models.Role;
 import com.usersvc.repository.IRoleRepository;
 
@@ -24,10 +23,12 @@ public class RoleServiceImpl implements IRoleService{
 	
 	
 	private final IRoleRepository roleRepository;
+	private final ModelMapper modelMapper; 
 	
-	public RoleServiceImpl(IRoleRepository roleRepository)
+	public RoleServiceImpl(IRoleRepository roleRepository,ModelMapper modelMapper)
 	{
 		this.roleRepository = roleRepository;
+		this.modelMapper = modelMapper;
 	}
 	
 	
@@ -35,18 +36,22 @@ public class RoleServiceImpl implements IRoleService{
 		@Transactional(readOnly = true)
 		@Loggable
 		
-		public List<Role> getAllRoles()
+		public List<RoleDto> getAllRoles()
 		{
-			return roleRepository.findAll();
+			List<Role> rolesList =  roleRepository.findAll();
+			Type listType = new TypeToken<List<RoleDto>>() {}.getType();
+			List<RoleDto> rolesDtoList =  modelMapper.map(rolesList, listType);
+			return rolesDtoList;
 		}
 	
 	//Get role by id
 	@Loggable
 	@Transactional(readOnly = true)
 	@Cacheable(value = "role", key = "#id")
-	public Optional<Role> getRoleById(long id)
+	public RoleDto getRoleById(long id)
 	{
-		Optional<Role> roleDetails =  roleRepository.findById(id);
+		Role role =  roleRepository.findById(id).orElseThrow(() -> new java.util.NoSuchElementException());
+		RoleDto roleDetails = modelMapper.map(role, RoleDto.class);
 		return roleDetails;
 	}
 	
@@ -55,9 +60,12 @@ public class RoleServiceImpl implements IRoleService{
 	@Loggable
 	@Transactional(propagation = Propagation.REQUIRED)
 	@CachePut(value = "role", key = "#role.id")
-	public Role addRole(Role role)
+	public RoleDto addRole(RoleDto roleDto)
 	{
-		return roleRepository.save(role);
+		Role newRole = modelMapper.map(roleDto, Role.class);
+		Role role =  roleRepository.save(newRole);
+		RoleDto roleDetails = modelMapper.map(role, RoleDto.class);
+		return roleDetails;
 		
 	}
 	
@@ -67,21 +75,15 @@ public class RoleServiceImpl implements IRoleService{
 	@Transactional(propagation = Propagation.REQUIRES_NEW,
 					rollbackFor = Exception.class,
 					noRollbackFor = EntityNotFoundException.class)
-	public Optional<Role> updateRole(Role updatedRole,long id)
+	public RoleDto updateRole(RoleDto updatedRoleDto,long id)
 	{
-		Optional<Role> roleDetails = roleRepository.findById(id);
-		 if(roleDetails.isPresent())
-		 {
-			Role role= roleDetails.get();
+		    Role updatedRole = modelMapper.map(updatedRoleDto, Role.class);
+			Role role = roleRepository.findById(id).orElseThrow(() -> new java.util.NoSuchElementException());;
 			role.setId(updatedRole.getId());
 			role.setRole_name(updatedRole.getRole_name());
-			roleRepository.save(role);
-		
-		}
-		 
-		 return roleDetails;
-		
-				
+			Role roleEntity = roleRepository.save(role);
+			RoleDto roleDetails = modelMapper.map(roleEntity, RoleDto.class);
+			return roleDetails;
 		
 	}
 	

@@ -1,11 +1,6 @@
 package com.usersvc.controller;
 
 import java.util.List;
-import java.util.Optional;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.usersvc.aspect.Loggable;
-import com.usersvc.models.Role;
-import com.usersvc.models.User;
-import com.usersvc.service.IRoleService;
+import com.usersvc.dto.RoleDto;
 import com.usersvc.service.RoleServiceImpl;
 
 import io.swagger.annotations.ApiOperation;
@@ -43,9 +36,9 @@ public class RoleController {
 	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public ResponseEntity<List<Role>> getAllRoles() {
-		List<Role> roleList = roleService.getAllRoles();
-		return new ResponseEntity<List<Role>>(roleList, new HttpHeaders(), HttpStatus.OK);
+	public List<RoleDto> getAllRoles() {
+		List<RoleDto> roleList = roleService.getAllRoles();
+		return roleList;
 	}
 
 	// fetch roles by id
@@ -57,13 +50,9 @@ public class RoleController {
 	        @ApiResponse(code = 204, message = "No resource found for this id"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token"),
 	})
-	public ResponseEntity<Role> getRolesById(@PathVariable long id) {
-		Optional<Role> roleDetails = roleService.getRoleById(id);
-		if (roleDetails.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(roleDetails.get());
-		} else {
-			return ResponseEntity.status(HttpStatus.OK).body(roleDetails.get());
-		}
+	public RoleDto getRolesById(@PathVariable long id) {
+		return roleService.getRoleById(id);
+
 	}
 
 	// create new user
@@ -74,8 +63,8 @@ public class RoleController {
 	        @ApiResponse(code = 201, message = "Successfully the record is created"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public ResponseEntity<Role> saveUser(@RequestBody Role role) {
-		return new ResponseEntity<Role>(roleService.addRole(role), HttpStatus.CREATED);
+	public RoleDto saveUser(@RequestBody RoleDto role) {
+	   return roleService.addRole(role);
 	}
 
 	// update existing user
@@ -87,13 +76,9 @@ public class RoleController {
 	        @ApiResponse(code = 204, message = "No resource found for this id"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public ResponseEntity<Role> updateRole(@RequestBody Role role, @PathVariable long id) {
-		Optional<Role> roleDetails = roleService.updateRole(role, id);
-		if (roleDetails.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(role);
-		} else {
-			return ResponseEntity.status(HttpStatus.OK).body(roleDetails.get());
-		}
+	public RoleDto updateRole(@RequestBody RoleDto role, @PathVariable long id) {
+		return roleService.updateRole(role, id);
+		
 	}
 
 	// delete roles

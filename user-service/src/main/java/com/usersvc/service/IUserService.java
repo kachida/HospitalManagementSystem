@@ -2,24 +2,24 @@ package com.usersvc.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+
 
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.usersvc.models.User;
+import com.usersvc.dto.UserDto;
 
 public interface IUserService {
 	
-	public List<User> getAllUsers(int pageNo, int pageSize, String sortBy);
-	public List<User> getUsersWithNameFilter(String query,int pageNo, int pageSize, String sortBy);
-	public List<User> getUsersWithMultipleFilter(String username, String role, String email,int pageNo, int pageSize, String sortBy);
-	public Optional<User> getUserById(long id);
-	public User addUser(User user) throws IOException;
-	public Optional<User> updateUser(User user,long id) throws IOException;
+	public List<UserDto> getAllUsers(int pageNo, int pageSize, String sortBy);
+	public List<UserDto> getUsersWithNameFilter(String query,int pageNo, int pageSize, String sortBy);
+	public List<UserDto> getUsersWithMultipleFilter(String username, String role, String email,int pageNo, int pageSize, String sortBy);
+	public UserDto getUserById(long id);
+	public UserDto addUser(UserDto user) throws IOException;
+	public UserDto updateUser(UserDto updatedUser,long id) throws IOException;
 	public void deleterUser(long id) throws IOException;
-	public List<User> getUsersWithEmailIdFilter(String query,int pageNo, int pageSize, String sortBy);
-	public List<User> getUsersWithRoleAndUserNameFilter(String username,String role,int pageNo, int pageSize, String sortBy);
-	public List<User> executeElasticSearchQuery(@RequestParam(name = "q") String query) throws IOException; 
+	public List<UserDto> getUsersWithEmailIdFilter(String query,int pageNo, int pageSize, String sortBy);
+	public List<UserDto> getUsersWithRoleAndUserNameFilter(String username,String role,int pageNo, int pageSize, String sortBy);
+	public List<UserDto> executeElasticSearchQuery(@RequestParam(name = "q") String query) throws IOException; 
 	
 	
 

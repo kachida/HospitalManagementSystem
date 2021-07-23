@@ -1,23 +1,22 @@
 package com.vitalsignsvc.service;
 
-import java.util.ArrayList;
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-
 import com.vitalsignsvc.aspect.Loggable;
+import com.vitalsignsvc.dto.VitalsignDto;
 import com.vitalsignsvc.feign.PatientServiceClient;
 import com.vitalsignsvc.feign.UserServiceClient;
 import com.vitalsignsvc.models.Patient;
@@ -35,29 +34,32 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	private final IVitalsignRepository vitalsignRepository;
 	private final PatientServiceClient patientServiceClient;
 	private final UserServiceClient userServiceClient;
+	private final ModelMapper modelMapper;
 	
-	public VitalsignServiceImpl( IVitalsignRepository vitalsignRepository,
-			PatientServiceClient patientServiceClient, UserServiceClient userServiceClient) {
+	public VitalsignServiceImpl( 
+			IVitalsignRepository vitalsignRepository,
+			PatientServiceClient patientServiceClient, 
+			UserServiceClient userServiceClient, 
+			ModelMapper modelMapper) {
 		super();
 		this.vitalsignRepository = vitalsignRepository;
 		this.patientServiceClient = patientServiceClient;
 		this.userServiceClient = userServiceClient;
+		this.modelMapper = modelMapper;
 	}
 
 	// fetch all vitalsign records
 	@Override
 	@Transactional(readOnly = true)
 	@Loggable
-	public List<Vitalsign> getAllVitalSignRecords(int pageNo, int pageSize, String sortBy) {
+	public List<VitalsignDto> getAllVitalSignRecords(int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
 		Pageable paging = PageRequest.of(pageNo, pageSize);
 		Page<Vitalsign> pagedResult = vitalsignRepository.findAll(paging);
-
-		if (pagedResult.hasContent()) {
-			return pagedResult.getContent();
-		} else {
-			return new ArrayList<Vitalsign>();
-		}
+		List<Vitalsign> vitalSignList = pagedResult.getContent();
+		Type listType = new TypeToken<List<VitalsignDto>>() {}.getType();
+		List<VitalsignDto> vitalsignDtoList =  modelMapper.map(vitalSignList, listType);
+		return vitalsignDtoList;
 	}
 
 	/*
@@ -66,10 +68,11 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	@Override
 	@Transactional(readOnly = true)
 	@Loggable
-	public Vitalsign getVitalsignRecordById(long id) {
+	public VitalsignDto getVitalsignRecordById(long id) {
 		// TODO Auto-generated method stub
-		Vitalsign vitalSign = vitalsignRepository.findById(id).orElse(null);
-		return vitalSign;
+		Vitalsign vitalsignDetails = vitalsignRepository.findById(id).orElseThrow(() -> new java.util.NoSuchElementException());
+		VitalsignDto vitalsignDto = modelMapper.map(vitalsignDetails, VitalsignDto.class);
+		return vitalsignDto;
 	}
 
 	/*
@@ -78,9 +81,12 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
 	@Loggable
-	public Vitalsign addVitalsignRecord(Vitalsign vitalSign) {
+	public VitalsignDto addVitalsignRecord(VitalsignDto vitalsignDto) {
 		
-		return vitalsignRepository.save(vitalSign);
+		Vitalsign myVitalsign = modelMapper.map(vitalsignDto, Vitalsign.class);
+		Vitalsign vitalsignEntity = vitalsignRepository.save(myVitalsign);
+		VitalsignDto vitalsign = modelMapper.map(vitalsignEntity, VitalsignDto.class);
+		return vitalsign;
 	}
 
 	/*
@@ -90,29 +96,31 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	@Override
 	@Loggable
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class, noRollbackFor = EntityNotFoundException.class)
-	public Optional<Vitalsign> updateVitalsignRecord(Vitalsign updatedVitalSign, long id) {
+	public VitalsignDto updateVitalsignRecord(VitalsignDto updatedVitalSignDto, long id) {
 
-		long patient_id = updatedVitalSign.getPatient_id();
-		long user_id = updatedVitalSign.getUser_id();
-
+		Vitalsign vitalsign = modelMapper.map(updatedVitalSignDto, Vitalsign.class);
+		// Retrieve patient name with given Id from Patient Module using fiegn client
+		long patient_id = vitalsign.getPatient_id();
+		long user_id = vitalsign.getUser_id();
 		User user = getUserServiceData(user_id);
 		Patient patient = getPatientServiceData(patient_id);
-		// Retrieve patient name with given Id from Patient Module using fiegn client
-		Optional<Vitalsign> vitalsignDetails = vitalsignRepository.findById(id);
-			Vitalsign vitalsign = vitalsignDetails.get();
-			vitalsign.setBloodsugar(updatedVitalSign.getBloodsugar());
-			vitalsign.setHeight(updatedVitalSign.getHeight());
-			vitalsign.setPatient_id(updatedVitalSign.getPatient_id());
-			vitalsign.setPulse(updatedVitalSign.getPulse());
-			vitalsign.setSpo2(updatedVitalSign.getSpo2());
-			vitalsign.setTemperature(updatedVitalSign.getTemperature());
-			vitalsign.setWeight(updatedVitalSign.getWeight());
-			vitalsign.setPatient_id(updatedVitalSign.getPatient_id());
-			vitalsign.setUser_id(updatedVitalSign.getUser_id());
-			vitalsign.setPatient_name(patient.getName());
-			vitalsign.setUser_name(user.getUsername());
-			vitalsignRepository.save(vitalsign);
-		return vitalsignDetails;
+		
+	    Vitalsign vitalsignEntity = vitalsignRepository.findById(id).orElseThrow(() -> new java.util.NoSuchElementException());;
+
+	    vitalsignEntity.setBloodsugar(vitalsign.getBloodsugar());
+	    vitalsignEntity.setHeight(vitalsign.getHeight());
+	    vitalsignEntity.setPatient_id(vitalsign.getPatient_id());
+	    vitalsignEntity.setPulse(vitalsign.getPulse());
+	    vitalsignEntity.setSpo2(vitalsign.getSpo2());
+	    vitalsignEntity.setTemperature(vitalsign.getTemperature());
+	    vitalsignEntity.setWeight(vitalsign.getWeight());
+	    vitalsignEntity.setPatient_id(vitalsign.getPatient_id());
+	    vitalsignEntity.setUser_id(vitalsign.getUser_id());
+	    vitalsignEntity.setPatient_name(patient.getName());
+	    vitalsignEntity.setUser_name(user.getUsername());
+		vitalsignRepository.save(vitalsignEntity);
+		VitalsignDto vitalsignDto = modelMapper.map(vitalsignEntity,VitalsignDto.class);
+		return vitalsignDto;
 	}
 
 	//Feign Client to fetch user details from user module API

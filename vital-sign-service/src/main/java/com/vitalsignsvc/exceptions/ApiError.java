@@ -94,6 +94,7 @@ public class ApiError {
 				);
 	}
 
+	@SuppressWarnings({"rawtypes"})
 	public void addValidationErrors(Set<ConstraintViolation<?>> constraintViolations )
 	{
 		for(ConstraintViolation constraintViolation:constraintViolations)

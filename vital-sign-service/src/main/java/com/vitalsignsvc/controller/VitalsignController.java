@@ -1,12 +1,7 @@
 package com.vitalsignsvc.controller;
 
 import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vitalsignsvc.aspect.Loggable;
+import com.vitalsignsvc.dto.VitalsignDto;
 import com.vitalsignsvc.models.AuthenticationRequest;
 import com.vitalsignsvc.models.AuthenticationResponse;
-import com.vitalsignsvc.models.Vitalsign;
 import com.vitalsignsvc.security.JwtUtil;
 import com.vitalsignsvc.service.IVitalsignService;
 import com.vitalsignsvc.service.MyUserDetailService;
@@ -66,10 +61,10 @@ public class VitalsignController {
 		        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
 		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 		})
-		public ResponseEntity<List<Vitalsign>> getAllVitalsignRecords(@RequestParam(defaultValue = "0") int pageNo,
+		public List<VitalsignDto> getAllVitalsignRecords(@RequestParam(defaultValue = "0") int pageNo,
 				@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "Id") String sortBy) {
-			List<Vitalsign> vitalsignList = vitalsignService.getAllVitalSignRecords(pageNo, pageSize, sortBy);
-			return new ResponseEntity<List<Vitalsign>>(vitalsignList, new HttpHeaders(), HttpStatus.OK);
+			return  vitalsignService.getAllVitalSignRecords(pageNo, pageSize, sortBy);
+			
 		}
 
 		// fetch vitalsign record by id
@@ -81,8 +76,8 @@ public class VitalsignController {
 		        @ApiResponse(code = 204, message = "No resource found for this id"),
 		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token"),
 		})
-		public ResponseEntity<Vitalsign> getUserById(@PathVariable long id) {
-			return ResponseEntity.status(HttpStatus.OK).body(vitalsignService.getVitalsignRecordById(id));
+		public VitalsignDto getUserById(@PathVariable long id) {
+			return vitalsignService.getVitalsignRecordById(id);
 		}
 
 		// create new vitalsign record
@@ -93,8 +88,8 @@ public class VitalsignController {
 		        @ApiResponse(code = 201, message = "Successfully the record is created"),
 		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 		})
-		public ResponseEntity<Vitalsign> saveVitalsignRecord(@RequestBody Vitalsign vitalsign) {
-			return new ResponseEntity<Vitalsign>(vitalsignService.addVitalsignRecord(vitalsign), HttpStatus.CREATED);
+		public VitalsignDto saveVitalsignRecord(@RequestBody VitalsignDto vitalsign) {
+			return vitalsignService.addVitalsignRecord(vitalsign);
 		}
 
 		// update existing vitalsign record
@@ -106,13 +101,9 @@ public class VitalsignController {
 		        @ApiResponse(code = 204, message = "No resource found for this id"),
 		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 		})
-		public ResponseEntity<Vitalsign> updateVitalsignRecord(@RequestBody Vitalsign vitalsign, @PathVariable long id) {
-			Optional<Vitalsign> vitalsignDetails = vitalsignService.updateVitalsignRecord(vitalsign, id);
-			if (vitalsignDetails.isEmpty()) {
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(vitalsign);
-			} else {
-				return ResponseEntity.status(HttpStatus.OK).body(vitalsignDetails.get());
-			}
+		public VitalsignDto updateVitalsignRecord(@RequestBody VitalsignDto vitalsign, @PathVariable long id) {
+			return vitalsignService.updateVitalsignRecord(vitalsign, id);
+			
 		}
 
 		// delete vitalsign record

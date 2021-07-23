@@ -1,14 +1,14 @@
 package com.patientsvc.service;
 
-import java.util.ArrayList;
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.patientsvc.aspect.Loggable;
+import com.patientsvc.dto.PatientDto;
 import com.patientsvc.models.Patient;
 import com.patientsvc.repository.IPatientRepository;
 import com.patientsvc.feign.UserServiceClient;
@@ -24,109 +25,100 @@ import com.patientsvc.models.User;
 
 @Service
 public class PatientServiceImpl implements IPatientService {
-	
-	
+
 	@PersistenceContext
 	private EntityManager entityManager;
-	
-	
+
 	private final IPatientRepository patientRepository;
 	private final UserServiceClient userServiceClient;
+	private final ModelMapper modelMapper;
 
-	public PatientServiceImpl( IPatientRepository patientRepository,
-			UserServiceClient userServiceClient) {
+	public PatientServiceImpl(IPatientRepository patientRepository, UserServiceClient userServiceClient,
+			ModelMapper modelMapper) {
 		super();
 		this.patientRepository = patientRepository;
 		this.userServiceClient = userServiceClient;
+		this.modelMapper = modelMapper;
 	}
 
-	//fetch all patients 
+	// fetch all patients
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	@Loggable
-	public List<Patient> getAllPatients(int pageNo, int pageSize, String sortBy) {
+	public List<PatientDto> getAllPatients(int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
 		Pageable paging = PageRequest.of(pageNo, pageSize);
 		Page<Patient> pagedResult = patientRepository.findAll(paging);
-		
-		if(pagedResult.hasContent())
-		{
-			return pagedResult.getContent();
-		}else
-		{
-			return new ArrayList<Patient>();
-		}
+		List<Patient> patientList = pagedResult.getContent();
+		Type listType = new TypeToken<List<PatientDto>>() {
+		}.getType();
+		List<PatientDto> patientDtoList = modelMapper.map(patientList, listType);
+		return patientDtoList;
 	}
 
-	/*Spring persistance implmenation using entity manager
-	 * Fetch patient by id
+	/*
+	 * Spring persistance implmenation using entity manager Fetch patient by id
 	 */
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	@Loggable
-	public Patient getPatientById(long id) {
+	public PatientDto getPatientById(long id) {
 		// TODO Auto-generated method stub
-		Patient patient = (Patient) entityManager.find(Patient.class, id);
-		return patient;
+		Patient patientDetails = (Patient) entityManager.find(Patient.class, id);
+		PatientDto patientDto = modelMapper.map(patientDetails, PatientDto.class);
+		return patientDto;
 	}
 
-	
-	/*Spring Persistance Implmentation using Entity Manager
-	 * create patient record
+	/*
+	 * Spring Persistance Implmentation using Entity Manager create patient record
 	 */
 	@Override
 	@Transactional
 	@Loggable
-	public Patient addPatient(Patient patient) {
-		entityManager.persist(patient);
-		return patient;
+	public PatientDto addPatient(PatientDto patient) {
+		Patient patientDetails = modelMapper.map(patient, Patient.class);
+		entityManager.persist(patientDetails);
+		PatientDto patientDto = modelMapper.map(patientDetails, PatientDto.class);
+		return patientDto;
 	}
-	
 
-
-	/*Spring persistance Implementation using Transaction Manager
-	 * update patient record
+	/*
+	 * Spring persistance Implementation using Transaction Manager update patient
+	 * record
 	 */
 	@Override
 	@Loggable
-	@Transactional(propagation = Propagation.REQUIRES_NEW,
-					rollbackFor = Exception.class,
-					noRollbackFor = EntityNotFoundException.class)
-	public Optional<Patient> updatePatient(Patient updatedPatient, long id) {
+	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class, noRollbackFor = EntityNotFoundException.class)
+	public PatientDto updatePatient(PatientDto updatedPatient, long id) {
 		// TODO Auto-generated method stub
-		long user_id = updatedPatient.getUser_id();
-		User user = getUserServiceData(user_id);
-		Optional<Patient> patientDetails = patientRepository.findById(id);
-		 if(patientDetails.isPresent())
-		 {
-			Patient patient= patientDetails.get();
-			patient.setName(updatedPatient.getName());
-			patient.setPhoneno(updatedPatient.getPhoneno());
-			patient.setEmail(updatedPatient.getEmail());
-			patient.setDateofvisit(updatedPatient.getDateofvisit());
-			patient.setComplain(updatedPatient.getComplain());
-			patientRepository.save(patient);
-		}
-		 return patientDetails;
+		Patient patient = modelMapper.map(updatedPatient, Patient.class);
+		Patient patientEntity = patientRepository.findById(id)
+				.orElseThrow(() -> new java.util.NoSuchElementException());
+		;
+		patientEntity.setName(patient.getName());
+		patientEntity.setPhoneno(patient.getPhoneno());
+		patientEntity.setEmail(patient.getEmail());
+		patientEntity.setDateofvisit(patient.getDateofvisit());
+		patientEntity.setComplain(patient.getComplain());
+		patientRepository.save(patientEntity);
+		PatientDto patientDto = modelMapper.map(patientEntity, PatientDto.class);
+		return patientDto;
 	}
-	
-	//Feign Client to fetch user details from user module API
+
+	// Feign Client to fetch user details from user module API
 	public User getUserServiceData(long user_id) {
 		return userServiceClient.getUserById(user_id);
 	}
 
-	/*Spring persistance Implementation using Transaction Manager
-	 * delete patient record
+	/*
+	 * Spring persistance Implementation using Transaction Manager delete patient
+	 * record
 	 */
 	@Override
 	@Loggable
-	@Transactional(propagation = Propagation.REQUIRES_NEW,
-					rollbackFor = Exception.class,
-					noRollbackFor = EntityNotFoundException.class)
+	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class, noRollbackFor = EntityNotFoundException.class)
 	public void deletePatient(long id) {
 		patientRepository.deleteById(id);
 	}
-	
-	
 
 }

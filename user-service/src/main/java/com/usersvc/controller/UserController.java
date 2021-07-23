@@ -4,13 +4,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,9 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.usersvc.aspect.Loggable;
+import com.usersvc.dto.UserDto;
 import com.usersvc.models.AuthenticationRequest;
 import com.usersvc.models.AuthenticationResponse;
-import com.usersvc.models.User;
 import com.usersvc.security.JwtUtil;
 import com.usersvc.service.IUserService;
 import com.usersvc.service.MyUserDetailService;
@@ -70,14 +66,14 @@ public class UserController {
 	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public List<User> getAllUsers(
+	public List<UserDto> getAllUsers(
 			@RequestParam(defaultValue="0") int pageNo,
 			@RequestParam(defaultValue="10") int pageSize,
 			@RequestParam(defaultValue="Id") String sortBy)
 	{
 		//Custom Metrics added to get the API Method execution time and Api request count
 		Instant start = Instant.now();
-		List<User> userList =  userService.getAllUsers(pageNo, pageSize, sortBy);
+		List<UserDto> userList =  userService.getAllUsers(pageNo, pageSize, sortBy);
 		Instant stop = Instant.now();
 		meterRegistry.counter("usersvc.getallusers.count").increment();
 		meterRegistry.timer("usersvc.getallusers.executiontime").record(Duration.between(start, stop).toMillis(),TimeUnit.MILLISECONDS);
@@ -94,11 +90,11 @@ public class UserController {
 	        @ApiResponse(code = 204, message = "No resource found for this id"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token"),
 	})
-	public User getUserById(@PathVariable long id)
+	public UserDto getUserById(@PathVariable long id)
 	{
 
-		Optional<User> userDetails =  userService.getUserById(id);
-		return userDetails.get();
+		UserDto userDetails =  userService.getUserById(id);
+		return userDetails;
 	}
 	
 	//filter and fetch users based on single field i.e, username using spring jpa filtering
@@ -109,13 +105,13 @@ public class UserController {
 	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public List<User> getUsersWithNameFilter(@RequestParam("query") String query,
+	public List<UserDto> getUsersWithNameFilter(@RequestParam("query") String query,
 			@RequestParam(defaultValue="0") int pageNo,
 			@RequestParam(defaultValue="10") int pageSize,
 			@RequestParam(defaultValue="Id") String sortBy)
 	{
 		
-		List<User> userList = userService.getUsersWithNameFilter(query, pageNo, pageSize, sortBy);
+		List<UserDto> userList = userService.getUsersWithNameFilter(query, pageNo, pageSize, sortBy);
 		return userList;
 	}
 	
@@ -127,13 +123,13 @@ public class UserController {
 		        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
 		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 		})
-		public List<User> getUsersWithEmailFilter(
+		public List<UserDto> getUsersWithEmailFilter(
 				@RequestParam("email") String email,
 				@RequestParam(defaultValue="0") int pageNo,
 				@RequestParam(defaultValue="10") int pageSize,
 				@RequestParam(defaultValue="Id") String sortBy)
 		{
-			List<User> userList = userService.getUsersWithEmailIdFilter(email, pageNo, pageSize, sortBy);
+			List<UserDto> userList = userService.getUsersWithEmailIdFilter(email, pageNo, pageSize, sortBy);
 			return userList;
 		}
 	
@@ -145,14 +141,14 @@ public class UserController {
 	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public List<User> getUsersWithNameRoleEmailFilter(@RequestParam("name") String username,
+	public List<UserDto> getUsersWithNameRoleEmailFilter(@RequestParam("name") String username,
 			@RequestParam("role") String role,
 			@RequestParam("email") String email,
 			@RequestParam(defaultValue="0") int pageNo,
 			@RequestParam(defaultValue="10") int pageSize,
 			@RequestParam(defaultValue="Id") String sortBy)
 	{
-		List<User> userList = userService.getUsersWithMultipleFilter(username,role,email, pageNo, pageSize, sortBy);
+		List<UserDto> userList = userService.getUsersWithMultipleFilter(username,role,email, pageNo, pageSize, sortBy);
 		return userList;
 	}
 	
@@ -165,13 +161,13 @@ public class UserController {
 	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public List<User> getUsersWithNameRoleFilter(@RequestParam("name") String username,
+	public List<UserDto> getUsersWithNameRoleFilter(@RequestParam("name") String username,
 			@RequestParam("role") String role,
 			@RequestParam(defaultValue="0") int pageNo,
 			@RequestParam(defaultValue="10") int pageSize,
 			@RequestParam(defaultValue="Id") String sortBy)
 	{
-		List<User> userList = userService.getUsersWithRoleAndUserNameFilter(username,role,pageNo, pageSize, sortBy);
+		List<UserDto> userList = userService.getUsersWithRoleAndUserNameFilter(username,role,pageNo, pageSize, sortBy);
 		return userList;
 	}
 	
@@ -183,9 +179,9 @@ public class UserController {
 	        @ApiResponse(code = 201, message = "Successfully the record is created"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public User saveUser(@RequestBody User user) throws IOException
+	public UserDto saveUser(@RequestBody UserDto userDto) throws IOException
 	{
-		return userService.addUser(user); 
+		return userService.addUser(userDto); 
 	}
 	
 	//update existing user
@@ -197,10 +193,10 @@ public class UserController {
 	        @ApiResponse(code = 204, message = "No resource found for this id"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public User updateUser(@RequestBody User user,@PathVariable long id) throws IOException
+	public UserDto updateUser(@RequestBody UserDto user,@PathVariable long id) throws IOException
 	{
-		Optional<User> userDetails = userService.updateUser(user,id);
-		return userDetails.get();
+		UserDto userDetails = userService.updateUser(user,id);
+		return userDetails;
 	}
 	
 	//delete user
@@ -238,7 +234,7 @@ public class UserController {
 	
 	@GetMapping("/executeElasticSearchQuery")
 	@Loggable
-	public List<User> executeElasticSearchQuery(@RequestParam(name = "q") String query) throws IOException
+	public List<UserDto> executeElasticSearchQuery(@RequestParam(name = "q") String query) throws IOException
 	{
 		return userService.executeElasticSearchQuery(query);
 	}

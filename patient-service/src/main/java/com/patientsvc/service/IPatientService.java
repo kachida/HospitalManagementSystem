@@ -1,16 +1,16 @@
 package com.patientsvc.service;
 
 import java.util.List;
-import java.util.Optional;
 
-import com.patientsvc.models.Patient;
+import com.patientsvc.dto.PatientDto;
+
 
 public interface IPatientService {
 	
-	public List<Patient> getAllPatients(int pageNo, int pageSize, String sortBy);
-	public Patient getPatientById(long id);
-	public Patient addPatient(Patient patient);
-	public Optional<Patient> updatePatient(Patient patient,long id);
+	public List<PatientDto> getAllPatients(int pageNo, int pageSize, String sortBy);
+	public PatientDto getPatientById(long id);
+	public PatientDto addPatient(PatientDto patient);
+	public PatientDto updatePatient(PatientDto patient,long id);
 	public void deletePatient(long id);
 	
 

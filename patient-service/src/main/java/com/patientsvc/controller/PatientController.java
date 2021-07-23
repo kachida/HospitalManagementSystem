@@ -1,12 +1,7 @@
 package com.patientsvc.controller;
 
 import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.patientsvc.aspect.Loggable;
+import com.patientsvc.dto.PatientDto;
 import com.patientsvc.models.AuthenticationRequest;
 import com.patientsvc.models.AuthenticationResponse;
-import com.patientsvc.models.Patient;
 import com.patientsvc.security.JwtUtil;
 import com.patientsvc.service.IPatientService;
 import com.patientsvc.service.MyUserDetailService;
@@ -63,10 +58,10 @@ public class PatientController {
 	        @ApiResponse(code = 200, message = "Successfully retrieved the record"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public List<Patient> getAllPatients(@RequestParam(defaultValue = "0") int pageNo,
+	public List<PatientDto> getAllPatients(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "Id") String sortBy) {
-		List<Patient> patientList = patientService.getAllPatients(pageNo, pageSize, sortBy);
-		return patientList;
+		return patientService.getAllPatients(pageNo, pageSize, sortBy);
+		
 
 	}
 
@@ -79,7 +74,7 @@ public class PatientController {
 	        @ApiResponse(code = 204, message = "No resource found for this id"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token"),
 	})
-	public Patient getUserById(@PathVariable long id) {
+	public PatientDto getUserById(@PathVariable long id) {
 		return patientService.getPatientById(id);
 	}
 
@@ -91,7 +86,7 @@ public class PatientController {
 	        @ApiResponse(code = 201, message = "Successfully the record is created"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public Patient savePatientRecord(@RequestBody Patient patient) {
+	public PatientDto savePatientRecord(@RequestBody PatientDto patient) {
 		return patientService.addPatient(patient);
 	}
 
@@ -104,9 +99,9 @@ public class PatientController {
 	        @ApiResponse(code = 204, message = "No resource found for this id"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public Patient updatePatientRecord(@RequestBody Patient patient, @PathVariable long id) {
-		Optional<Patient> patientDetails = patientService.updatePatient(patient, id);
-		return patientDetails.get();
+	public PatientDto updatePatientRecord(@RequestBody PatientDto patient, @PathVariable long id) {
+		return patientService.updatePatient(patient, id);
+		
 	}
 
 	// delete patients
