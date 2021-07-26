@@ -1,5 +1,6 @@
 package com.vitalsignsvc.controller;
 
+import java.io.IOException;
 import java.util.List;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.http.ResponseEntity;
@@ -88,7 +89,7 @@ public class VitalsignController {
 		        @ApiResponse(code = 201, message = "Successfully the record is created"),
 		        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 		})
-		public VitalsignDto saveVitalsignRecord(@RequestBody VitalsignDto vitalsign) {
+		public VitalsignDto saveVitalsignRecord(@RequestBody VitalsignDto vitalsign) throws IOException {
 			return vitalsignService.addVitalsignRecord(vitalsign);
 		}
 

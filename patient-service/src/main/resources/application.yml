@@ -1,6 +1,9 @@
 server:
    port: 8082
 
+elasticsearch:
+   connection.url: elasticsearch:9200
+
 spring:
   jackson:
      serialization:
@@ -50,7 +53,15 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
+  data:
+    elasticsearch:
+     cluster-name: elasticsearch
+     cluster-nodes: elasticsearch:9200
+
 management:
+   health:
+      elasticsearch:
+         enabled: false
    endpoints:
        web:
          exposure:

@@ -1,14 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.hospitalmanagementsystem</groupId>
-  <artifactId>hospitalmanagementsystem</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  
-  <modules>
-    <module>user-service</module>
-    <module>patient-service</module>
-    <module>vital-sign-service</module>
-</modules>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.hospitalmanagementsystem</groupId>
+	<artifactId>hospitalmanagementsystem</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>user-service</module>
+		<module>patient-service</module>
+		<module>vital-sign-service</module>
+		<module>elastic-search</module>
+	</modules>
+
 </project>

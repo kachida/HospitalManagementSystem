@@ -8,7 +8,12 @@ import java.util.stream.Collectors;
 import org.javers.core.metamodel.object.CdoSnapshot;
 
 import com.usersvc.models.UserAudit;
+import com.usersvc.service.UserServiceImpl;
 
+import ch.qos.logback.classic.Logger;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class CdoSnapshotToEntityChangeVOConverter {
 
 	private CdoSnapshotToEntityChangeVOConverter()
@@ -19,9 +24,12 @@ public class CdoSnapshotToEntityChangeVOConverter {
 	
 	public static UserAudit convert(CdoSnapshot from, UserAudit to)
 	{
+		log.info("userAudit convert");
+		log.info(from.toString());
 		to.setAction(extractAction(from));
 		to.setEntityType(from.getManagedType().getName());
-		to.setEntityId(from.getGlobalId().value().split("/")[1]);
+		to.setEntityId(from.getGlobalId().value());
+		//to.setEntityId(from.getGlobalId().value().split("/")[1]);
 		to.setModifiedBy(from.getCommitMetadata().getAuthor());
 		to.setChangedEntityFields(from.getChanged());
 		to.setEntityValue(from.getState().getPropertyNames().stream().collect(Collectors.toMap(key -> key , key -> {

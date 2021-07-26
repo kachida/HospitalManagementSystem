@@ -1,12 +1,11 @@
 package com.usersvc.service;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
-import java.lang.reflect.Type;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
@@ -16,6 +15,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
@@ -35,9 +36,10 @@ import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.javers.core.Javers;
 import org.javers.spring.annotation.JaversAuditable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,23 +53,29 @@ import com.usersvc.dto.UserDto;
 import com.usersvc.models.User;
 import com.usersvc.repository.IUserRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @Service
+@Slf4j
 public class UserServiceImpl implements IUserService{
 	
 	private final String INDEX="userdata";
-	 private final String TYPE = "users";
+	private final String TYPE = "users";
 	ObjectMapper objectMapper = new ObjectMapper();
 	
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+   
     private final RestHighLevelClient restHighLevelClient = new RestHighLevelClient(RestClient.builder(new HttpHost("elasticsearch",9200,"http"), new HttpHost("elasticsearch",9300,"http")));
 	private final IUserRepository userRepository;
 	private final ModelMapper modelMapper; 
+	private Tracer tracer;
+
 	
-	public UserServiceImpl(IUserRepository userRepository,ModelMapper modelMapper )
+	public UserServiceImpl(IUserRepository userRepository,ModelMapper modelMapper, Tracer tracer)
 	{
 		this.userRepository = userRepository;
 		this.modelMapper = modelMapper;
+		this.tracer = tracer;
 	}
 	
 	@PersistenceContext
@@ -119,19 +127,24 @@ public class UserServiceImpl implements IUserService{
 	//@Transactional(propagation = Propagation.REQUIRED)
 	@Loggable
 	@JaversAuditable
-	@SuppressWarnings("unchecked")
-	public UserDto addUser(UserDto userDto) throws IOException
+	public UserDto addUser(User user) throws IOException
 	{
-		User myUser = modelMapper.map(userDto, User.class);
-		User userEntity = userRepository.save(myUser);
+		User userEntity =  userRepository.save(user);
+		Map<String, Object> dataMap = objectMapper.convertValue(userEntity, Map.class);
+		IndexRequest indexRequest = new IndexRequest(INDEX, TYPE,String.valueOf(userEntity.getId())).source(dataMap);
+		IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+		log.info("resut --> "+response.getResult());
+		UserDto myUserDto = modelMapper.map(userEntity, UserDto.class);
+		return myUserDto;
+		/*
 		UserDto myUserDto = modelMapper.map(userEntity, UserDto.class);
 		//Elastic Search
 		Map<String, Object> dataMap = objectMapper.convertValue(userEntity, Map.class);
 		IndexRequest indexRequest = new IndexRequest(INDEX, TYPE,String.valueOf(userEntity.getId())).source(dataMap);
 		IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
-		logger.info("resut --> "+response.getResult());
+		log.info("resut --> "+response.getResult());
 		return myUserDto;
-		
+		*/
 	}
 	
 	//update existing user
@@ -162,7 +175,7 @@ public class UserServiceImpl implements IUserService{
 			request.setQuery(new TermQueryBuilder("Id",id));
 			request.setScript(new Script(ScriptType.INLINE,"painless","ctx._source.putAll(params)",parameters));
 			BulkByScrollResponse response = restHighLevelClient.updateByQuery(request, RequestOptions.DEFAULT);
-		    logger.info("elastic search update response {}"+ String.valueOf(response.getUpdated()));
+		    log.info("elastic search update response {}", String.valueOf(response.getUpdated()));
 		 
 		    return myUserDto;
 		
@@ -173,14 +186,16 @@ public class UserServiceImpl implements IUserService{
 	@Transactional(propagation = Propagation.REQUIRES_NEW,
 			rollbackFor = Exception.class,
 			noRollbackFor = EntityNotFoundException.class)
-	public void deleterUser(long id) throws IOException
+	public void  deleterUser(long id,Span rootSpan) throws IOException
 	{
+		Span span = tracer.buildSpan("service delete user").asChildOf(rootSpan).start();
 		userRepository.deleteById(id);
+		span.finish();
 		DeleteByQueryRequest request = new DeleteByQueryRequest(INDEX);
 		request.setConflicts("proceed");
 		request.setQuery(new TermQueryBuilder("Id",id));
 		BulkByScrollResponse response =  restHighLevelClient.deleteByQuery(request, RequestOptions.DEFAULT);
-		logger.info("elastic search delete response {}"+ String.valueOf(response.getDeleted()));
+		log.info("elastic search delete response --> {}", String.valueOf(response.getDeleted()));
 	}
 
 
@@ -191,7 +206,9 @@ public class UserServiceImpl implements IUserService{
 	public List<UserDto> getUsersWithMultipleFilter(String username, String role, String email, int pageNo, int pageSize,
 			String sortBy) {
 		
+	
 		List<UserDto> userDtoList = new ArrayList<UserDto>();
+		/*
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery query = cb.createQuery(User.class);
 		Root<User> userRoot = query.from(User.class);
@@ -218,7 +235,9 @@ public class UserServiceImpl implements IUserService{
 			Type listType = new TypeToken<List<UserDto>>() {}.getType();
 			userDtoList =  modelMapper.map(userList, listType);
 		}
-		return userDtoList;
+		*/
+		return null;
+		
 	}
 
 
@@ -232,6 +251,7 @@ public class UserServiceImpl implements IUserService{
 		// TODO Auto-generated method stub
 
 		List<UserDto> userDtoList = new ArrayList<UserDto>();
+		/*
 		Query q = entityManager.createNamedQuery("User.FindByEmail");
 		q.setParameter(1, query);
 		List<User> userList=q.getResultList();
@@ -240,7 +260,8 @@ public class UserServiceImpl implements IUserService{
 			Type listType = new TypeToken<List<UserDto>>() {}.getType();
 			userDtoList =  modelMapper.map(userList, listType);
 		}
-		return userDtoList;
+	*/
+		return null;
 
 	}
 
@@ -253,7 +274,9 @@ public class UserServiceImpl implements IUserService{
 	public List<UserDto> getUsersWithRoleAndUserNameFilter(String username, String role, int pageNo, int pageSize,
 			String sortBy) {
 		
+		
 		List<UserDto> userDtoList = new ArrayList<UserDto>();
+		/*
 		Query q = entityManager.createNamedQuery("User.FindByRoleAndUsername");
 		q.setParameter(1, role);
 		q.setParameter(2, username);
@@ -263,42 +286,31 @@ public class UserServiceImpl implements IUserService{
 			Type listType = new TypeToken<List<UserDto>>() {}.getType();
 			userDtoList =  modelMapper.map(userList, listType);
 		}
-		return userDtoList;
+		*/
+		return null;
 	}
 
 
 	@Override
-	public List<UserDto> executeElasticSearchQuery(String query) throws IOException {
+	public Map<String, Object> executeElasticSearchQuery(String query) throws IOException {
 		
-		List<UserDto> userDtoList = new ArrayList<UserDto>();
+		
+		Map<String, Object> sourceAsMap = new HashMap<String,Object>();
 		StringBuilder sb = new StringBuilder(query);
 	    SearchRequest searchRequest = new SearchRequest();
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(QueryBuilders.queryStringQuery(sb.toString()));
         searchRequest.source(searchSourceBuilder);
         SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        logger.info("search response --> "+ searchResponse.status());
+        log.info("search response --> {} ", searchResponse.status());
         SearchHits hits = searchResponse.getHits();
-        List<User> userList = new ArrayList<User>();
         SearchHit[] searchHits = hits.getHits();
         for (SearchHit hit : searchHits)
         {
-        	User user = new User();
-        	Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-        	user.setId(Long.parseLong((String) sourceAsMap.get("Id")));       	
-        	user.setRole((String) sourceAsMap.get("role"));
-        	user.setEmail((String) sourceAsMap.get("email"));
-        	user.setUsername((String) sourceAsMap.get("username"));
-        	user.setCreatedBy((String) sourceAsMap.get("createdBy"));
-        	user.setLastModifiedBy((String) sourceAsMap.get("lastModifiedBy"));
-        	userList.add(user);
+   
+        	 sourceAsMap = hit.getSourceAsMap();
         }
-        if(userList.size()>0)
-		{
-			Type listType = new TypeToken<List<UserDto>>() {}.getType();
-			userDtoList =  modelMapper.map(userList, listType);
-		}
-		return userDtoList;
+		return sourceAsMap;
 	}
 
 }

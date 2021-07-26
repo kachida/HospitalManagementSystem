@@ -1,12 +1,20 @@
 package com.patientsvc.service;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
@@ -16,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.patientsvc.aspect.Loggable;
 import com.patientsvc.dto.PatientDto;
 import com.patientsvc.models.Patient;
@@ -32,6 +41,10 @@ public class PatientServiceImpl implements IPatientService {
 	private final IPatientRepository patientRepository;
 	private final UserServiceClient userServiceClient;
 	private final ModelMapper modelMapper;
+	private final String INDEX="patientdata";
+	private final String TYPE = "patients";
+	private final RestHighLevelClient restHighLevelClient = new RestHighLevelClient(RestClient.builder(new HttpHost("elasticsearch",9200,"http"), new HttpHost("elasticsearch",9300,"http")));
+	private ObjectMapper objectMapper = new ObjectMapper();
 
 	public PatientServiceImpl(IPatientRepository patientRepository, UserServiceClient userServiceClient,
 			ModelMapper modelMapper) {
@@ -75,9 +88,12 @@ public class PatientServiceImpl implements IPatientService {
 	@Override
 	@Transactional
 	@Loggable
-	public PatientDto addPatient(PatientDto patient) {
+	public PatientDto addPatient(PatientDto patient) throws IOException {
 		Patient patientDetails = modelMapper.map(patient, Patient.class);
 		entityManager.persist(patientDetails);
+		Map<String, Object> dataMap = objectMapper.convertValue(patientDetails, Map.class);
+		IndexRequest indexRequest = new IndexRequest(INDEX, TYPE,String.valueOf(patientDetails.getId())).source(dataMap);
+		IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 		PatientDto patientDto = modelMapper.map(patientDetails, PatientDto.class);
 		return patientDto;
 	}

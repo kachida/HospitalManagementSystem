@@ -130,12 +130,12 @@
 		<dependency>
 			<groupId>org.javers</groupId>
 			<artifactId>javers-spring-boot-starter-sql</artifactId>
-			<version>6.2.1</version>
+			<version>6.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.javers</groupId>
 			<artifactId>javers-core</artifactId>
-			<version>6.2.1</version>
+			<version>6.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
@@ -153,6 +153,26 @@
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>2.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>io.opentracing.contrib</groupId>
+			<artifactId>opentracing-spring-jaeger-cloud-starter</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign.opentracing</groupId>
+			<artifactId>feign-opentracing</artifactId>
+			<version>0.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.collections</groupId>
+			<artifactId>google-collections</artifactId>
+			<version>1.0</version>
 		</dependency>
 	</dependencies>
 

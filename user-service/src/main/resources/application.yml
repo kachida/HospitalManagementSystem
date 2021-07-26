@@ -100,6 +100,17 @@ api:
    password: ${api_password}
    secretKey: ${secret_key}
 
+logging:
+  file:
+    name: application.log
+
+opentracing:
+  jaeger:
+    udp-sender:
+        host: jaeger
+        port: 6831
+    log-spans: true
+
 management:
    health:
      redis:

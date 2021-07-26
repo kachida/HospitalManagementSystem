@@ -1,0 +1,13 @@
+com.patientsvc
+com.patientsvc.aspect
+com.patientsvc.configuration
+com.patientsvc.controller
+com.patientsvc.dto
+com.patientsvc.exceptions
+com.patientsvc.feign
+com.patientsvc.filter
+com.patientsvc.models
+com.patientsvc.repository
+com.patientsvc.security
+com.patientsvc.service
+com.springboot.microservices.patientservice

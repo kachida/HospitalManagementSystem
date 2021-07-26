@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import com.google.common.collect.ImmutableMap;
 
-
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,11 +27,14 @@ import com.usersvc.aspect.Loggable;
 import com.usersvc.dto.UserDto;
 import com.usersvc.models.AuthenticationRequest;
 import com.usersvc.models.AuthenticationResponse;
+import com.usersvc.models.User;
 import com.usersvc.security.JwtUtil;
 import com.usersvc.service.IUserService;
 import com.usersvc.service.MyUserDetailService;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -48,14 +53,18 @@ public class UserController {
 	private final AuthenticationManager authenticationManager;
 	private final MyUserDetailService userDetailsService;
 	private final JwtUtil jwtUtilToken;
+	private Tracer tracer;
+	private ModelMapper modelMapper;
 	
-	public UserController(MeterRegistry meterRegistry,IUserService userService,AuthenticationManager authenticationManager,MyUserDetailService userDetailsService, JwtUtil jwtUtilToken)
+	public UserController(MeterRegistry meterRegistry,IUserService userService,AuthenticationManager authenticationManager,MyUserDetailService userDetailsService, JwtUtil jwtUtilToken, Tracer tracer,ModelMapper modelMapper)
 	{
 		this.meterRegistry= meterRegistry;
 		this.userService= userService;
 		this.authenticationManager= authenticationManager;
+		this.tracer= tracer;
 		this.userDetailsService = userDetailsService;
 		this.jwtUtilToken = jwtUtilToken;
+		this.modelMapper = modelMapper ;
 	}
 	
 	//fetch all users pagination supported
@@ -181,7 +190,8 @@ public class UserController {
 	})
 	public UserDto saveUser(@RequestBody UserDto userDto) throws IOException
 	{
-		return userService.addUser(userDto); 
+		User user = modelMapper.map(userDto, User.class);
+		return userService.addUser(user); 
 	}
 	
 	//update existing user
@@ -210,7 +220,10 @@ public class UserController {
 	})
 	public void deleteUser(@PathVariable long id) throws IOException
 	{
-		userService.deleterUser(id);
+		Span span = tracer.buildSpan("delete user").start();
+        span.log(ImmutableMap.of("event", "delete-request", "value", String.valueOf(id)));
+		userService.deleterUser(id,span);
+		span.finish();
 	}
 	
 	//Authenticate
@@ -234,7 +247,7 @@ public class UserController {
 	
 	@GetMapping("/executeElasticSearchQuery")
 	@Loggable
-	public List<UserDto> executeElasticSearchQuery(@RequestParam(name = "q") String query) throws IOException
+	public Map<String, Object> executeElasticSearchQuery(@RequestParam(name = "q") String query) throws IOException
 	{
 		return userService.executeElasticSearchQuery(query);
 	}

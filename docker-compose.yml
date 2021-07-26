@@ -107,6 +107,8 @@ services:
          - xpack.security.enabled=false
          - discovery.type=single-node
          - cluster.name=elasticsearch
+         - bootstrap.memory_lock=true
+         - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       ulimits:
          memlock:
            soft: -1
@@ -117,7 +119,7 @@ services:
       cap_add:
            - IPC_LOCK
       volumes:
-           - elasticsearch-data:/usr/share/elasticsearch/data
+           - elasticsearch-data:/usr/share/elasticsearch/data:rw  #Persistence Data
       ports:
            - 9200:9200
            - 9300-9300
@@ -125,13 +127,58 @@ services:
 
   kibana:
      container_name: kibana
-     image: kibana:7.13.4
+     image: docker.elastic.co/kibana/kibana:7.9.0
+     networks:
+         - microservices-network
+     volumes:
+         - ./logstash/kibana.yml:/usr/share/kibana/kibana.yml
      environment:
          - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+         - ELASTICSEARCH_URL=http://elasticsearch:9200
+         - LOGGING_VERBOSE=TRUE
      ports:
          - 5601:5601
      depends_on:
          - elasticsearch
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.9.0
+    container_name: logstash
+    command: logstash -f /etc/logstash/conf.d/logstash.conf
+    networks:
+         - microservices-network
+    ports:
+      - "25826:25826"
+      - "5044:5044"
+      - "5000:5000"
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf               # Pipeline configuration
+    restart: on-failure
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.7
+    container_name: jaeger
+    restart: on-failure
+    networks:
+         - microservices-network
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 9411:9411
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    depends_on:
+      - elasticsearch
+
 
 
   #This container will stop as soon as the vault-setup script gets completed
@@ -171,6 +218,11 @@ services:
       - spring_data_mongodb_port=27017
       - spring_data_mongodb_database=user
       - ELASTICSEARCH_CONNECTION_URL=elasticsearch:9200
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
+       
     depends_on:
       - mysqldb
       - vault
@@ -181,6 +233,9 @@ services:
       - kafka
       - mongo
       - elasticsearch
+      - kibana
+      - logstash
+      - jaeger
 
   patient-service:
     container_name: patient-service
@@ -208,7 +263,7 @@ services:
     environment:
       spring.cloud.consul.host: consul
     ports:
-      - "8083:8083"
+      - "8088:8088"
     depends_on:
       - mysqldb
       - vault

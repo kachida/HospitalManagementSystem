@@ -1,0 +1,3 @@
+server.port: 0.0.0.0:5601
+elasticsearch.url: "http://elasticsearch:9200"
+server.name: "kibana"

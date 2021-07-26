@@ -1,5 +1,6 @@
 package com.patientsvc.controller;
 
+import java.io.IOException;
 import java.util.List;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.http.ResponseEntity;
@@ -86,7 +87,7 @@ public class PatientController {
 	        @ApiResponse(code = 201, message = "Successfully the record is created"),
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden, check jwt token")
 	})
-	public PatientDto savePatientRecord(@RequestBody PatientDto patient) {
+	public PatientDto savePatientRecord(@RequestBody PatientDto patient) throws IOException {
 		return patientService.addPatient(patient);
 	}
 

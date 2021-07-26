@@ -1,0 +1,33 @@
+server:
+   port: 8084
+
+elasticsearch:
+   connection.url: elasticsearch:9200
+
+spring:
+  application:
+    name: elasticsearch-service
+  cloud:
+      consul:
+       host: http://consul
+       port: 8500
+       config:
+           enabled: false
+           import-check:
+                enabled: false
+       discovery:
+           healthCheckInterval: 15s
+           instance-id: elasticsearch-service
+       load-balancer:
+           ribbon:
+             enabled: false
+  data:
+    elasticsearch:
+     cluster-name: elasticsearch
+     cluster-nodes: elasticsearch:9200
+
+
+management:
+   health:
+     elasticsearch:
+      enabled: false

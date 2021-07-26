@@ -1,12 +1,20 @@
 package com.vitalsignsvc.service;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
@@ -15,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vitalsignsvc.aspect.Loggable;
 import com.vitalsignsvc.dto.VitalsignDto;
 import com.vitalsignsvc.feign.PatientServiceClient;
@@ -35,6 +45,10 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	private final PatientServiceClient patientServiceClient;
 	private final UserServiceClient userServiceClient;
 	private final ModelMapper modelMapper;
+	private final String INDEX="vitalsigndata";
+	private final String TYPE = "vitalsigns";
+	private final RestHighLevelClient restHighLevelClient = new RestHighLevelClient(RestClient.builder(new HttpHost("elasticsearch",9200,"http"), new HttpHost("elasticsearch",9300,"http")));
+	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	public VitalsignServiceImpl( 
 			IVitalsignRepository vitalsignRepository,
@@ -81,10 +95,13 @@ public class VitalsignServiceImpl implements IVitalsignService {
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
 	@Loggable
-	public VitalsignDto addVitalsignRecord(VitalsignDto vitalsignDto) {
+	public VitalsignDto addVitalsignRecord(VitalsignDto vitalsignDto) throws IOException {
 		
 		Vitalsign myVitalsign = modelMapper.map(vitalsignDto, Vitalsign.class);
 		Vitalsign vitalsignEntity = vitalsignRepository.save(myVitalsign);
+		Map<String, Object> dataMap = objectMapper.convertValue(vitalsignEntity, Map.class);
+		IndexRequest indexRequest = new IndexRequest(INDEX, TYPE,String.valueOf(vitalsignEntity.getId())).source(dataMap);
+		IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 		VitalsignDto vitalsign = modelMapper.map(vitalsignEntity, VitalsignDto.class);
 		return vitalsign;
 	}
