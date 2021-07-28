@@ -1,0 +1,32 @@
+spring:
+  application:
+     name: config-server
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/KACHIDA/hospital_management_system_config_files.git
+          username: kannappanchidambaram@gmail.com
+          default-label: main
+          refreshRate : 5
+          password: Abirami@01052020
+    loadbalancer:
+      ribbon:
+         enabled: false
+    consul:
+      host: http://consul
+      port: 8500
+      load-balancer:
+           ribbon:
+             enabled: false
+
+server:
+    port: 8888
+
+management:
+  endpoint:
+    health:
+     show-details: always
+  security:
+    enabled: false

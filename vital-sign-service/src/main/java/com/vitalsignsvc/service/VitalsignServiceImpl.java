@@ -11,7 +11,6 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -101,7 +100,7 @@ public class VitalsignServiceImpl implements IVitalsignService {
 		Vitalsign vitalsignEntity = vitalsignRepository.save(myVitalsign);
 		Map<String, Object> dataMap = objectMapper.convertValue(vitalsignEntity, Map.class);
 		IndexRequest indexRequest = new IndexRequest(INDEX, TYPE,String.valueOf(vitalsignEntity.getId())).source(dataMap);
-		IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+		restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 		VitalsignDto vitalsign = modelMapper.map(vitalsignEntity, VitalsignDto.class);
 		return vitalsign;
 	}

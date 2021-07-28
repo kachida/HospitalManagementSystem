@@ -11,18 +11,37 @@ import org.springframework.stereotype.Service;
 import com.usersvc.models.UserAudit;
 import com.usersvc.utils.CdoSnapshotToEntityChangeVOConverter;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class UserAuditProducerService.
+ *
+ * @author : Kannappan
+ * @version : 1.0
+ */
 @Service
 public class UserAuditProducerService {
 	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(UserAuditProducerService.class);
 	
+	/** The kafka template. */
 	private final KafkaTemplate<String,UserAudit> kafkaTemplate;
 	
+	/**
+	 * Instantiates a new user audit producer service.
+	 *
+	 * @param entityChangeKafkaTemplate the entity change kafka template
+	 */
 	public UserAuditProducerService(KafkaTemplate<String, UserAudit> entityChangeKafkaTemplate)
 	{
 		this.kafkaTemplate = entityChangeKafkaTemplate; 
 	}
 	
+	/**
+	 * Broadcast entity change.
+	 *
+	 * @param commit the commit
+	 */
 	public void broadcastEntityChange(Commit commit)
 	{
 		if(commit.getSnapshots().isEmpty())
@@ -36,6 +55,11 @@ public class UserAuditProducerService {
 		send(new ProducerRecord<>(topic,vo));
 	}
 	
+	/**
+	 * Send.
+	 *
+	 * @param record the record
+	 */
 	public void send(ProducerRecord<String, UserAudit> record)
 	{
 		kafkaTemplate.send(record).addCallback(
@@ -48,6 +72,12 @@ public class UserAuditProducerService {
 	}
 	
 	
+	/**
+	 * Gets the managed type simple name.
+	 *
+	 * @param snapshot the snapshot
+	 * @return the managed type simple name
+	 */
 	protected static String getManagedTypeSimpleName(CdoSnapshot snapshot)
 	{
 		String className = snapshot.getManagedType().getName();

@@ -41,6 +41,14 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 
+
+// TODO: Auto-generated Javadoc
+/**
+ * UserController.
+ *
+ * @author : Kannappan
+ * @version : 1.0
+ */
 @RestController
 @RequestMapping("/users")
 @Api(value="UserController", description="Operations pertaining to users in user module API")
@@ -48,14 +56,38 @@ public class UserController {
 	
 
 	
+	/** The meter registry. */
 	private final MeterRegistry meterRegistry;
+	
+	/** The user service. */
 	private final IUserService userService;
+	
+	/** The authentication manager. */
 	private final AuthenticationManager authenticationManager;
+	
+	/** The user details service. */
 	private final MyUserDetailService userDetailsService;
+	
+	/** The jwt util token. */
 	private final JwtUtil jwtUtilToken;
+	
+	/** The tracer. */
 	private Tracer tracer;
+	
+	/** The model mapper. */
 	private ModelMapper modelMapper;
 	
+	/**
+	 * Instantiates a new user controller.
+	 *
+	 * @param meterRegistry the meter registry
+	 * @param userService the user service
+	 * @param authenticationManager the authentication manager
+	 * @param userDetailsService the user details service
+	 * @param jwtUtilToken the jwt util token
+	 * @param tracer the tracer
+	 * @param modelMapper the model mapper
+	 */
 	public UserController(MeterRegistry meterRegistry,IUserService userService,AuthenticationManager authenticationManager,MyUserDetailService userDetailsService, JwtUtil jwtUtilToken, Tracer tracer,ModelMapper modelMapper)
 	{
 		this.meterRegistry= meterRegistry;
@@ -67,6 +99,14 @@ public class UserController {
 		this.modelMapper = modelMapper ;
 	}
 	
+	/**
+	 * Gets the all users.
+	 *
+	 * @param pageNo the page no
+	 * @param pageSize the page size
+	 * @param sortBy the sort by
+	 * @return the all users
+	 */
 	//fetch all users pagination supported
 	@GetMapping("/")
 	@Loggable
@@ -90,6 +130,12 @@ public class UserController {
 		
 	}
 	
+	/**
+	 * Gets the user by id.
+	 *
+	 * @param id the id
+	 * @return the user by id
+	 */
 	//fetch user by id
 	@GetMapping("/{id}")
 	@Loggable
@@ -106,6 +152,15 @@ public class UserController {
 		return userDetails;
 	}
 	
+	/**
+	 * Gets the users with name filter.
+	 *
+	 * @param query the query
+	 * @param pageNo the page no
+	 * @param pageSize the page size
+	 * @param sortBy the sort by
+	 * @return the users with name filter
+	 */
 	//filter and fetch users based on single field i.e, username using spring jpa filtering
 	@GetMapping("/search")
 	@Loggable
@@ -124,6 +179,15 @@ public class UserController {
 		return userList;
 	}
 	
+	/**
+	 * Gets the users with email filter.
+	 *
+	 * @param email the email
+	 * @param pageNo the page no
+	 * @param pageSize the page size
+	 * @param sortBy the sort by
+	 * @return the users with email filter
+	 */
 	//Fetch users based on emailid - using namedqueries 
 		@GetMapping("/filter/emailid")
 		@Loggable
@@ -142,6 +206,17 @@ public class UserController {
 			return userList;
 		}
 	
+	/**
+	 * Gets the users with name role email filter.
+	 *
+	 * @param username the username
+	 * @param role the role
+	 * @param email the email
+	 * @param pageNo the page no
+	 * @param pageSize the page size
+	 * @param sortBy the sort by
+	 * @return the users with name role email filter
+	 */
 	//filter and fetch users based on multiple fields (username, email,role) - using criteria API 
 	@GetMapping("/filter")
 	@Loggable
@@ -162,6 +237,16 @@ public class UserController {
 	}
 	
 	
+	/**
+	 * Gets the users with name role filter.
+	 *
+	 * @param username the username
+	 * @param role the role
+	 * @param pageNo the page no
+	 * @param pageSize the page size
+	 * @param sortBy the sort by
+	 * @return the users with name role filter
+	 */
 	//Filter and fetch users based on multiple fields i.e, username and role using namedqueries)
 	@GetMapping("/filter/roleAndName")
 	@Loggable
@@ -180,6 +265,13 @@ public class UserController {
 		return userList;
 	}
 	
+	/**
+	 * Save user.
+	 *
+	 * @param userDto the user dto
+	 * @return the user dto
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	//create new user
 	@PostMapping("/")
 	@Loggable
@@ -194,6 +286,14 @@ public class UserController {
 		return userService.addUser(user); 
 	}
 	
+	/**
+	 * Update user.
+	 *
+	 * @param user the user
+	 * @param id the id
+	 * @return the user dto
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	//update existing user
 	@PutMapping("/{id}")
 	@Loggable
@@ -205,10 +305,17 @@ public class UserController {
 	})
 	public UserDto updateUser(@RequestBody UserDto user,@PathVariable long id) throws IOException
 	{
-		UserDto userDetails = userService.updateUser(user,id);
+		User userEntity = modelMapper.map(user, User.class);
+		UserDto userDetails = userService.updateUser(userEntity,id);
 		return userDetails;
 	}
 	
+	/**
+	 * Delete user.
+	 *
+	 * @param id the id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	//delete user
 	@DeleteMapping("/{id}")
 	@Loggable
@@ -226,6 +333,13 @@ public class UserController {
 		span.finish();
 	}
 	
+	/**
+	 * Creates the authentication token.
+	 *
+	 * @param authenticationRequest the authentication request
+	 * @return the response entity
+	 * @throws Exception the exception
+	 */
 	//Authenticate
 	@PostMapping("/authenticate")
 	@Loggable
@@ -245,6 +359,13 @@ public class UserController {
 	}
 	
 	
+	/**
+	 * Execute elastic search query.
+	 *
+	 * @param query the query
+	 * @return the map
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@GetMapping("/executeElasticSearchQuery")
 	@Loggable
 	public Map<String, Object> executeElasticSearchQuery(@RequestParam(name = "q") String query) throws IOException

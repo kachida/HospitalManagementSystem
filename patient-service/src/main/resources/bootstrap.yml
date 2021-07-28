@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: patient-service
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        max-attempts: 20
+        max-interval: 15000
+        initial-interval: 10000
+        discovery:
+          enabled: true
+          service-id: config-server
+    vault:
+        url: http://vault:8200
+        token: 00000000-0000-0000-0000-000000000000
+        scheme: http
+        host: vault
+        port: 8200
+        kv:
+         enabled: true
+         backend: secret
+         application-name: hospitalmanagementsystem
+
+server:
+  port: 8082

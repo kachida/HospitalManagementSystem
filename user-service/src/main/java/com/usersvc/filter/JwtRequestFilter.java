@@ -16,12 +16,29 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.usersvc.security.JwtUtil;
 import com.usersvc.service.MyUserDetailService;
 
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class JwtRequestFilter.
+ *
+ * @author : Kannappan
+ * @version : 1.0
+ */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
+	/** The user details service. */
 	private final MyUserDetailService userDetailsService;
+	
+	/** The jwt util. */
 	private final JwtUtil jwtUtil;
 
+	/**
+	 * Instantiates a new jwt request filter.
+	 *
+	 * @param userDetailsService the user details service
+	 * @param jwtUtil the jwt util
+	 */
 	public JwtRequestFilter(MyUserDetailService userDetailsService, JwtUtil jwtUtil) {
 
 		this.userDetailsService = userDetailsService;
@@ -29,6 +46,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	}
 
+	/**
+	 * Do filter internal.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param filterChain the filter chain
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {

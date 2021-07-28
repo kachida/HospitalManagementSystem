@@ -253,6 +253,19 @@ services:
       - user-service
       - setup-vault
       - consul
+  
+  config-server:
+     container_name: config-server
+     build: ./config-server
+     restart: always
+     networks:
+       - microservices-network
+     environment:
+         spring.cloud.consul.host: consul
+     ports:
+       - "8888:8888"
+     depends_on:
+       - consul
 
   vital-sign-service:
     container_name: vital-sign-service

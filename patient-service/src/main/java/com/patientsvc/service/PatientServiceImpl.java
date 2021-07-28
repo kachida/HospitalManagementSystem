@@ -11,7 +11,6 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -93,7 +92,7 @@ public class PatientServiceImpl implements IPatientService {
 		entityManager.persist(patientDetails);
 		Map<String, Object> dataMap = objectMapper.convertValue(patientDetails, Map.class);
 		IndexRequest indexRequest = new IndexRequest(INDEX, TYPE,String.valueOf(patientDetails.getId())).source(dataMap);
-		IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+		restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 		PatientDto patientDto = modelMapper.map(patientDetails, PatientDto.class);
 		return patientDto;
 	}

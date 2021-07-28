@@ -15,6 +15,13 @@ CREATE TABLE `user` (
   UNIQUE KEY `id` (`ID`)
 );
 
+/*
+CREATE TABLE `USER_ROLE`(
+`row_id` int NOT NULL AUTO_INCREMENT,
+`user_id` int NOT NULL,
+`role_id` int NOT NULL
+)*/
+
 CREATE TABLE `patient` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,

@@ -8,28 +8,45 @@ import java.util.stream.Collectors;
 import org.javers.core.metamodel.object.CdoSnapshot;
 
 import com.usersvc.models.UserAudit;
-import com.usersvc.service.UserServiceImpl;
-
-import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
 
+
+// TODO: Auto-generated Javadoc
+/**
+ *  The Constant log.
+ *
+ * @author : Kannappan
+ * @version : 1.0
+ */
+
+/** The Constant log. */
 @Slf4j
 public class CdoSnapshotToEntityChangeVOConverter {
 
+	/**
+	 * Instantiates a new cdo snapshot to entity change VO converter.
+	 */
 	private CdoSnapshotToEntityChangeVOConverter()
 	{
 		
 	}
 	
 	
+	/**
+	 * Convert.
+	 *
+	 * @param from the from
+	 * @param to the to
+	 * @return the user audit
+	 */
 	public static UserAudit convert(CdoSnapshot from, UserAudit to)
 	{
 		log.info("userAudit convert");
 		log.info(from.toString());
 		to.setAction(extractAction(from));
 		to.setEntityType(from.getManagedType().getName());
-		to.setEntityId(from.getGlobalId().value());
-		//to.setEntityId(from.getGlobalId().value().split("/")[1]);
+		//to.setEntityId(from.getGlobalId().value());
+		to.setEntityId(from.getGlobalId().value().split("/")[1]);
 		to.setModifiedBy(from.getCommitMetadata().getAuthor());
 		to.setChangedEntityFields(from.getChanged());
 		to.setEntityValue(from.getState().getPropertyNames().stream().collect(Collectors.toMap(key -> key , key -> {
@@ -46,6 +63,12 @@ public class CdoSnapshotToEntityChangeVOConverter {
 		
 	}
 	
+	/**
+	 * Extract action.
+	 *
+	 * @param from the from
+	 * @return the string
+	 */
 	private static String extractAction(CdoSnapshot from)
 	{
 		switch(from.getType())

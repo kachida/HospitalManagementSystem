@@ -7,9 +7,21 @@ import io.jaegertracing.internal.JaegerTracer;
 import io.jaegertracing.Configuration.SamplerConfiguration;
 import io.jaegertracing.Configuration.ReporterConfiguration;
 
+// TODO: Auto-generated Javadoc
+/**
+ * JaegerConfig.
+ *
+ * @author : Kannappan
+ * @version : 1.0
+ */
 @Configuration
 public class JaegerConfig {
 	
+	/**
+	 * Gets the tracer.
+	 *
+	 * @return the tracer
+	 */
 	@Bean
 	public static JaegerTracer getTracer() {
 	    SamplerConfiguration samplerConfig = SamplerConfiguration.fromEnv().withType("const").withParam(1);

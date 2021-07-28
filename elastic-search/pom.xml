@@ -52,8 +52,8 @@
 			<artifactId>spring-cloud-starter-consul-config</artifactId>
 		</dependency>
 	</dependencies>
-	
-	
+
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -65,7 +65,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -80,5 +80,5 @@
 			</resource>
 		</resources>
 	</build>
-	
+
 </project>

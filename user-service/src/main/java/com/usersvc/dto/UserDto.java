@@ -1,6 +1,5 @@
 package com.usersvc.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,4 +39,9 @@ public class UserDto {
 	  */
 	String address;
 
+	/**
+	  * Roles
+	  */
+	//List<RoleDto> roles;
+	String roles;
 }

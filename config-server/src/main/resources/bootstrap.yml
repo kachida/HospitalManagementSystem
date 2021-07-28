@@ -1,0 +1,14 @@
+spring:
+  application:
+     name: config-server
+
+  cloud:
+    loadbalancer:
+      ribbon:
+         enabled: false
+    consul:
+      host: http://consul
+      port: 8500
+      load-balancer:
+           ribbon:
+             enabled: false

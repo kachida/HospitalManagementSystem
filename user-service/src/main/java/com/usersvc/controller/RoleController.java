@@ -18,16 +18,36 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+
+// TODO: Auto-generated Javadoc
+/**
+ * RoleController.
+ *
+ * @author Kannappan
+ * @version 1.0
+ */
 @RestController
 @RequestMapping("/roles")
 public class RoleController {
 
+	/** The role service. */
 	private final RoleServiceImpl roleService;
+	
+	/**
+	 * Instantiates a new role controller.
+	 *
+	 * @param roleService the role service
+	 */
 	public RoleController(RoleServiceImpl roleService)
 	{
 		this.roleService = roleService;
 	}
 
+	/**
+	 * Gets the all roles.
+	 *
+	 * @return the all roles
+	 */
 	// fetch all roles
 	@GetMapping("/")
 	@Loggable
@@ -41,6 +61,12 @@ public class RoleController {
 		return roleList;
 	}
 
+	/**
+	 * Gets the roles by id.
+	 *
+	 * @param id the id
+	 * @return the roles by id
+	 */
 	// fetch roles by id
 	@GetMapping("/{id}")
 	@Loggable
@@ -55,6 +81,12 @@ public class RoleController {
 
 	}
 
+	/**
+	 * Save user.
+	 *
+	 * @param role the role
+	 * @return the role dto
+	 */
 	// create new user
 	@PostMapping("/")
 	@Loggable
@@ -67,6 +99,13 @@ public class RoleController {
 	   return roleService.addRole(role);
 	}
 
+	/**
+	 * Update role.
+	 *
+	 * @param role the role
+	 * @param id the id
+	 * @return the role dto
+	 */
 	// update existing user
 	@PutMapping("/{id}")
 	@Loggable
@@ -81,6 +120,11 @@ public class RoleController {
 		
 	}
 
+	/**
+	 * Delete role.
+	 *
+	 * @param id the id
+	 */
 	// delete roles
 	@DeleteMapping("/{id}")
 	@Loggable

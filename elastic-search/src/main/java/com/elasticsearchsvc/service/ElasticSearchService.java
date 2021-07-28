@@ -1,9 +1,7 @@
 package com.elasticsearchsvc.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpHost;
@@ -17,8 +15,6 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
-
-import com.elasticsearchsvc.dto.UserDto;
 
 @Service
 public class ElasticSearchService {

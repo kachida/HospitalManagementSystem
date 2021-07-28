@@ -18,13 +18,30 @@ import com.usersvc.dto.RoleDto;
 import com.usersvc.models.Role;
 import com.usersvc.repository.IRoleRepository;
 
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class RoleServiceImpl.
+ *
+ * @author : Kannappan
+ * @version : 1.0
+ */
 @Service
 public class RoleServiceImpl implements IRoleService{
 	
 	
+	/** The role repository. */
 	private final IRoleRepository roleRepository;
+	
+	/** The model mapper. */
 	private final ModelMapper modelMapper; 
 	
+	/**
+	 * Instantiates a new role service impl.
+	 *
+	 * @param roleRepository the role repository
+	 * @param modelMapper the model mapper
+	 */
 	public RoleServiceImpl(IRoleRepository roleRepository,ModelMapper modelMapper)
 	{
 		this.roleRepository = roleRepository;
@@ -32,6 +49,11 @@ public class RoleServiceImpl implements IRoleService{
 	}
 	
 	
+	/**
+	 * Gets the all roles.
+	 *
+	 * @return the all roles
+	 */
 	//Get All roles
 		@Transactional(readOnly = true)
 		@Loggable
@@ -44,6 +66,12 @@ public class RoleServiceImpl implements IRoleService{
 			return rolesDtoList;
 		}
 	
+	/**
+	 * Gets the role by id.
+	 *
+	 * @param id the id
+	 * @return the role by id
+	 */
 	//Get role by id
 	@Loggable
 	@Transactional(readOnly = true)
@@ -57,6 +85,12 @@ public class RoleServiceImpl implements IRoleService{
 	
 	//Add new role
 	
+	/**
+	 * Adds the role.
+	 *
+	 * @param roleDto the role dto
+	 * @return the role dto
+	 */
 	@Loggable
 	@Transactional(propagation = Propagation.REQUIRED)
 	@CachePut(value = "role", key = "#role.id")
@@ -69,6 +103,13 @@ public class RoleServiceImpl implements IRoleService{
 		
 	}
 	
+	/**
+	 * Update role.
+	 *
+	 * @param updatedRoleDto the updated role dto
+	 * @param id the id
+	 * @return the role dto
+	 */
 	//update existing role
 	@Loggable
 	@CachePut(value = "role", key = "#id")
@@ -87,6 +128,11 @@ public class RoleServiceImpl implements IRoleService{
 		
 	}
 	
+	/**
+	 * Delete role.
+	 *
+	 * @param id the id
+	 */
 	//delete role
 	@Loggable
 	@CacheEvict(value = "role", key="#id")

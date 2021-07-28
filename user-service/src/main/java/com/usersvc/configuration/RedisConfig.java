@@ -12,10 +12,23 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import com.usersvc.models.Role;
 
+
+// TODO: Auto-generated Javadoc
+/**
+ * RedisConfig.
+ *
+ * @author : Kannappan
+ * @version : 1.0
+ */
 @Configuration
 public class RedisConfig {
 
 	
+	/**
+	 * Jedis connection factory.
+	 *
+	 * @return the jedis connection factory
+	 */
 	@Bean
 	JedisConnectionFactory jedisConnectionFactory()
 	{
@@ -31,6 +44,11 @@ public class RedisConfig {
 	
 	}
 	
+	/**
+	 * Redis template.
+	 *
+	 * @return the redis template
+	 */
 	@Bean
 	RedisTemplate<String, Role> redisTemplate() {
 		RedisTemplate<String, Role> redisTemplate = new RedisTemplate<>();
