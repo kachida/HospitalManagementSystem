@@ -105,6 +105,17 @@ public class User {
 		super();
 	}
 	
+	public User(long Id, String roles, String username, String email, String phonenumber, String address, String createdBy)
+	{
+		this.Id = Id;
+		this.roles = roles;
+		this.username = username;
+		this.email = email;
+		this.phonenumber = phonenumber;
+		this.address = address;
+		this.createdBy = createdBy;
+		
+	}
 	
 
 }
