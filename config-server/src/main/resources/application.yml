@@ -7,10 +7,66 @@ spring:
       server:
         git:
           uri: https://github.com/KACHIDA/hospital_management_system_config_files.git
-          username: kannappanchidambaram@gmail.com
           default-label: main
           refreshRate : 5
-          password: Abirami@01052020
+          ignore-local-ssh-settings: true
+          private-key: 
+                        "-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: AES-128-CBC,7010A2E8247407DA4936250F817CF56C
+
+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
+-----END RSA PRIVATE KEY-----
+"
+                               
     loadbalancer:
       ribbon:
          enabled: false
