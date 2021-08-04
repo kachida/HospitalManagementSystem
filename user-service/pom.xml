@@ -199,6 +199,11 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+		    <groupId>org.openclover</groupId>
+		    <artifactId>clover-maven-plugin</artifactId>
+		    <version>4.2.0</version>
+		</plugin>
 		</plugins>
 				<resources>
 			<resource>

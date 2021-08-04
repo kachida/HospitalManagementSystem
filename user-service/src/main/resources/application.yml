@@ -5,11 +5,14 @@ elasticsearch:
    connection.url: elasticsearch:9200
 
 spring:
+  config:
+      import: 
+        - vault://secret/hospitalmanagementsystem/test
   application:
     name: user-service
   cloud:
       consul:
-       host: http://consul
+       host: http://localhost
        port: 8500
        config:
            enabled: false
@@ -22,10 +25,10 @@ spring:
            ribbon:
              enabled: false
       vault:
-        url: http://vault:8200
+        url: http://localhost:8200
         token: 00000000-0000-0000-0000-000000000000
         scheme: http
-        host: vault
+        host: localhost
         port: 8200
         kv:
          enabled: true
@@ -71,16 +74,16 @@ spring:
   data:
     elasticsearch:
      cluster-name: elasticsearch
-     cluster-nodes: elasticsearch:9200
+     cluster-nodes: localhost:9200
     mongo:
-      host: mongo
+      host: localhost
       database: user
       port: 27017
 
   
 
   kafka:
-    bootstrap-servers: kakfa:9092
+    bootstrap-servers: localhost:9092
     producer:
        key-serializer: org.apache.kafka.common.serialization.StringSerializer
        value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -105,9 +108,12 @@ logging:
     name: application.log
 
 opentracing:
+  spring:
+    web:
+     ignoreAutoConfiguredSkipPatterns : true
   jaeger:
     udp-sender:
-        host: jaeger
+        host: localhost
         port: 6831
     log-spans: true
 
@@ -123,3 +129,13 @@ management:
        web:
          exposure:
              include: '*'
+
+
+log4j:
+   rootlogger: DEBUG,tcp
+   appender: 
+     tcp: 
+      Port: 3456
+      RemoteHost: localhost
+      ReconnectionDelay: 1000
+      Application: user-service 

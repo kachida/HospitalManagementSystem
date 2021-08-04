@@ -3,6 +3,8 @@ package com.usersvc.service;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +12,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
@@ -31,12 +31,17 @@ import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.hibernate.Criteria;
 import org.javers.spring.annotation.JaversAuditable;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.repository.support.PageableExecutionUtils;
+import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +52,8 @@ import com.usersvc.dto.UserDto;
 import com.usersvc.models.User;
 import com.usersvc.repository.IUserRepository;
 
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -71,7 +78,7 @@ public class UserServiceImpl implements IUserService{
 	ObjectMapper objectMapper = new ObjectMapper();
 	
     /** The rest high level client. */
-    private final RestHighLevelClient restHighLevelClient = new RestHighLevelClient(RestClient.builder(new HttpHost("elasticsearch",9200,"http"), new HttpHost("elasticsearch",9300,"http")));
+    RestHighLevelClient restHighLevelClient = new RestHighLevelClient(RestClient.builder(new HttpHost("elasticsearch",9200,"http"), new HttpHost("elasticsearch",9300,"http")));
 	
 	/** The user repository. */
 	private final IUserRepository userRepository;
@@ -81,6 +88,10 @@ public class UserServiceImpl implements IUserService{
 	
 	/** The tracer. */
 	private Tracer tracer;
+	
+	/** The mongo template. */
+	private MongoTemplate mongoTemplate;
+	
 
 	
 	/**
@@ -91,12 +102,15 @@ public class UserServiceImpl implements IUserService{
 	 * @param tracer the tracer
 	 * @param roleRepository the role repository
 	 */
-	public UserServiceImpl(IUserRepository userRepository,ModelMapper modelMapper, Tracer tracer)
+	public UserServiceImpl(IUserRepository userRepository,ModelMapper modelMapper, Tracer tracer, MongoTemplate mongoTemplate)
 	{
 		this.userRepository = userRepository;
 		this.modelMapper = modelMapper;
 		this.tracer = tracer;	
+		this.mongoTemplate = mongoTemplate;
 	}
+	
+	
 	
 	/** The entity manager. */
 	@PersistenceContext
@@ -404,6 +418,23 @@ public class UserServiceImpl implements IUserService{
         	 sourceAsMap = hit.getSourceAsMap();
         }
 		return sourceAsMap;
+	}
+	
+	public Page<User> getAllUsersCreatedInDateRange(LocalDateTime fromDate, LocalDateTime endDate, Integer page, Integer size )
+	{
+		 Pageable pageable = PageRequest.of(page != null ? page : 0, size != null ? size : 10);
+		 var query = new Query().with(pageable);
+		 final List<org.springframework.data.mongodb.core.query.Criteria> criteria = new ArrayList<>();
+		 
+		 if(fromDate != null)
+			 criteria.add(org.springframework.data.mongodb.core.query.Criteria.where("createdDate").gte(fromDate));
+		 if(endDate != null)
+			 criteria.add(org.springframework.data.mongodb.core.query.Criteria.where("createdDate").lte(endDate));
+		 
+		 if(!criteria.isEmpty())
+			 query.addCriteria(new org.springframework.data.mongodb.core.query.Criteria().andOperator(criteria.toArray(new org.springframework.data.mongodb.core.query.Criteria[0])));
+		 
+		 return PageableExecutionUtils.getPage(mongoTemplate.find(query, User.class), pageable, () -> mongoTemplate.count(query.skip(0).limit(0), User.class));
 	}
 
 }
