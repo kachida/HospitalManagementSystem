@@ -1,9 +1,11 @@
 package com.usersvc.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.usersvc.dto.UserDto;
@@ -122,8 +124,10 @@ public interface IUserService {
 	 * @return the map
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public Map<String, Object> executeElasticSearchQuery(@RequestParam(name = "q") String query) throws IOException; 
+	public Map<String, Object> executeElasticSearchQuery(String query) throws IOException; 
 	
+	
+	public Page<User> getAllUsersCreatedInDateRange(LocalDateTime fromDate, LocalDateTime endDate, Integer page, Integer size );
 	
 
 }

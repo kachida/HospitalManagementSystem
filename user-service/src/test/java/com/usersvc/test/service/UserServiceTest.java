@@ -1,35 +1,35 @@
 package com.usersvc.test.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.usersvc.dto.UserDto;
 import com.usersvc.models.User;
+import com.usersvc.models.YamlProperties;
 import com.usersvc.repository.IUserRepository;
 import com.usersvc.service.IUserService;
+import com.usersvc.service.UserServiceImpl;
+
+import io.opentracing.Tracer;
 
 /**
  * The Class UserServiceTest.
@@ -38,34 +38,71 @@ import com.usersvc.service.IUserService;
  * @version : 1.0
  */
 @SpringBootTest	
+@AutoConfigureMockMvc
 public class UserServiceTest {
 	
 	
 	@Autowired
-	private IUserService userService;
+	private UserServiceImpl userService;
 	
 	@MockBean(answer=Answers.RETURNS_DEFAULTS)
 	private IUserRepository userRepository;
 	
+	private Tracer tracer;
+	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	private final String TYPE = "users";
+	private final String INDEX="userdata";
+	
+	@Autowired
+	public MockMvc mockMvc;
+	
+	private RestHighLevelClient restHighLevelClient = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost",9200,"http"), new HttpHost("localhost",9300,"http")));
+	
+	@Autowired
+	private YamlProperties yamlProps;
+	
+	private String token;
+	
+	@Before
+	public void setup()
+	{
+		restHighLevelClient = mock(RestHighLevelClient.class);
+	}
+
+	public String getToken() throws Exception{
+		
+		String username = yamlProps.getUsername();
+		String password = yamlProps.getPassword();
+		String body="{\"username\":\"" + username+"\", \"password\":\"" + password +"\"}";
+		
+		MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.post("/users/authenticate").
+				content(body).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
+		String response = result.getResponse().getContentAsString();
+		response = response.replace("{\"jwt\":\"", "");
+		token = response.replace("\"}", "").replace("\"", "");
+		return token;
+		
+	}
 	
 	@Test
 	public void createUserTest() throws Exception {
 
+		
+		
 		User user = new User(1, "Doctor", "Kannappan", "kannappanchidambaram@gmail.com", "9500853473", "Chennai",
 				"Admin");
+		//when( new IndexRequest(INDEX, TYPE,String.valueOf(userEntity.getId())).source(dataMap));
+		when(restHighLevelClient.index(new IndexRequest(), RequestOptions.DEFAULT)).thenReturn(null);
 		when(userRepository.save(user)).thenReturn(user);
 		assertEquals(user,userService.addUser(user));
 
 	}
 	
-	/**
-	 * Gets the user test.
-	 *
-	 * @return the user details
-	 * @throws Exception the exception
-	 */
+	/*
+
 	@Test
 	public void getUserTest() throws Exception
 	{
@@ -78,11 +115,7 @@ public class UserServiceTest {
 
 	}
 	
-	/**
-	 * Update user test.
-	 *
-	 * @throws Exception the exception
-	 */
+
 	@Test
 	public void updateUserTest() throws Exception
 	{
@@ -96,11 +129,7 @@ public class UserServiceTest {
         
 	}
 	
-	/**
-	 * Delete user test.
-	 *
-	 * @throws Exception the exception
-	 */
+
 	@Test
 	public void deleteUserTest() throws Exception
 	{
@@ -108,13 +137,7 @@ public class UserServiceTest {
 		userService.deleterUser(1,null);
 		verify(userRepository, times(1)).deleteById(userId);
 	}
-	
-	/**
-	 * Gets the all users test.
-	 *
-	 * @return  all users 
-	 * @throws Exception the exception
-	 */
+
 	@Test
 	public void getAllUsersTest() throws Exception
 	{
@@ -133,5 +156,7 @@ public class UserServiceTest {
 		assertEquals(userDtoList, userService.getAllUsers(0, 2, "desc"));
 		
 	}
+	
+	*/
 	
 }

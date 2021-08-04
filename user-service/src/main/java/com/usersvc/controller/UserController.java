@@ -3,12 +3,15 @@ package com.usersvc.controller;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import com.google.common.collect.ImmutableMap;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -373,6 +376,13 @@ public class UserController {
 		return userService.executeElasticSearchQuery(query);
 	}
 	
+	
+	@GetMapping("/getAllUsersCreatedInDateRange")
+	@Loggable
+	public Page<User> getAllUsersCreatedInDateRange(@RequestParam(required = false) LocalDateTime fromDate, @RequestParam(required = false) LocalDateTime endDate,  @RequestParam(required = false) Integer page,  @RequestParam(required = false) Integer size )
+	{
+	    return userService.getAllUsersCreatedInDateRange(fromDate, endDate, page,size);
+	}
 	
 
 }
